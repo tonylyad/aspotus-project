@@ -1,0 +1,2 @@
+# aspotus-project
+Общий проект для курса Otus C# ASP.NET Core разработчик
