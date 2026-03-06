@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/deploy/">
+    <File Path="deploy/README.md" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="docs/README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <File Path="src/README.md" />
+    <Project Path="src/Aspotus.Catalog.Api/Aspotus.Catalog.Api.csproj" />
+    <Project Path="src/Aspotus.Gateway/Aspotus.Gateway.csproj" />
+    <Project Path="src/Aspotus.Orders.Api/Aspotus.Orders.Api.csproj" />
+    <Project Path="src/Aspotus.Shared/Aspotus.Shared.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <File Path="tests/README.md" />
+  </Folder>
+</Solution>
