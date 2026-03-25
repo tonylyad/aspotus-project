@@ -16,3 +16,7 @@ dotnet ef database update --project Aspotus.Catalog.Api --startup-project Aspotu
 в базе будут созданы таблицы
 
 После этого выбираем Aspotus.Catalog.Api как стартовый проект и запускаем
+
+Для Aspotus.Orders.Api
+dotnet ef migrations add InitialCreate --project Aspotus.Orders.Api --startup-project Aspotus.Orders.Api
+dotnet ef database update --project Aspotus.Orders.Api --startup-project Aspotus.Orders.Api

@@ -1,4 +1,6 @@
-﻿namespace Aspotus.Orders.Api.Extensions
+﻿using Aspotus.Orders.Api.Middlewares;
+
+namespace Aspotus.Orders.Api.Extensions
 {
     public static class ApplicationBuilderExtensions
     {
@@ -14,6 +16,19 @@
                 });
             }
 
+
+
+            return app;
+        }
+
+        /// <summary>
+        /// Подключает middleware глобальной обработки исключений.
+        /// </summary>
+        /// <param name="app">Экземпляр веб-приложения.</param>
+        /// <returns>Настроенный экземпляр веб-приложения.</returns>
+        public static WebApplication UseExceptionHandling(this WebApplication app)
+        {
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
             return app;
         }
     }
