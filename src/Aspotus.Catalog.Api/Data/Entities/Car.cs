@@ -48,10 +48,25 @@ public class Car
     public int Year { get; set; }
 
     /// <summary>
+    /// Пробег автомобиля в километрах.
+    /// </summary>
+    public int Mileage { get; set; }
+
+    /// <summary>
     /// Тип кузова автомобиля.
     /// Например: Sedan, Suv, Hatchback.
     /// </summary>
     public string BodyType { get; set; } = null!;
+
+    /// <summary>
+    /// Название комплектации автомобиля.
+    /// </summary>
+    public string? TrimLevelName { get; set; }
+
+    /// <summary>
+    /// Описание комплектации автомобиля.
+    /// </summary>
+    public string? TrimLevelDescription { get; set; }
 
     /// <summary>
     /// Объём двигателя в литрах.

@@ -1,4 +1,6 @@
-﻿namespace Aspotus.Catalog.Api.Data.Entities;
+﻿using Aspotus.Catalog.Api.Enums;
+
+namespace Aspotus.Catalog.Api.Data.Entities;
 
 /// <summary>
 /// Запчасть в каталоге.
@@ -45,6 +47,29 @@ public class Part
     public bool IsOriginal { get; set; }
 
     /// <summary>
+    /// Тип состояния запчасти: новая или бывшая в употреблении.
+    /// </summary>
+    public PartConditionType ConditionType { get; set; }
+
+    /// <summary>
+    /// Процент состояния БУ-запчасти.
+    /// Для новой запчасти обычно не используется.
+    /// </summary>
+    public int? ConditionPercent { get; set; }
+
+    /// <summary>
+    /// Текстовое описание состояния БУ-запчасти:
+    /// дефекты, следы эксплуатации и т.д.
+    /// </summary>
+    public string? ConditionDescription { get; set; }
+
+    /// <summary>
+    /// Пробег автомобиля на момент снятия БУ-запчасти.
+    /// Для новой запчасти обычно не используется.
+    /// </summary>
+    public int? MileageAtRemoval { get; set; }
+
+    /// <summary>
     /// Идентификатор категории запчасти.
     /// </summary>
     public Guid CategoryId { get; set; }
@@ -68,4 +93,9 @@ public class Part
     /// Список связей совместимости между запчастью и автомобилями.
     /// </summary>
     public ICollection<PartCompatibility> PartCompatibilities { get; set; } = new List<PartCompatibility>();
+
+    /// <summary>
+    /// Список артикулов заменителей для данной запчасти.
+    /// </summary>
+    public ICollection<PartReplacement> ReplacementArticles { get; set; } = new List<PartReplacement>();
 }

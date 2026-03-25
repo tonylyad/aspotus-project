@@ -4,8 +4,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Aspotus.Catalog.Api.Data.Configurations;
 
+/// <summary>
+/// Конфигурация сущности запчасти для Entity Framework Core.
+/// </summary>
 public class PartConfiguration : IEntityTypeConfiguration<Part>
 {
+    /// <summary>
+    /// Выполняет настройку сущности запчасти.
+    /// </summary>
     public void Configure(EntityTypeBuilder<Part> builder)
     {
         builder.ToTable("Parts");
@@ -31,6 +37,14 @@ public class PartConfiguration : IEntityTypeConfiguration<Part>
 
         builder.Property(x => x.IsOriginal)
             .IsRequired();
+
+        builder.Property(x => x.ConditionType)
+            .IsRequired();
+
+        builder.Property(x => x.ConditionDescription)
+            .HasMaxLength(1000);
+
+        builder.Property(x => x.MileageAtRemoval);
 
         builder.HasOne(x => x.Category)
             .WithMany(x => x.Parts)

@@ -70,12 +70,7 @@ public class CarModelService : ICarModelService
         {
             Id = Guid.NewGuid(),
             Name = normalizedName,
-            BrandId = request.BrandId,
-            Brand = new CarBrand
-            {
-                Id = brand.Id,
-                Name = brand.Name
-            }
+            BrandId = request.BrandId
         };
 
         await _carModelRepository.AddAsync(entity, cancellationToken);
@@ -113,12 +108,7 @@ public class CarModelService : ICarModelService
         {
             Id = existingModel.Id,
             Name = normalizedName,
-            BrandId = request.BrandId,
-            Brand = new CarBrand
-            {
-                Id = brand.Id,
-                Name = brand.Name
-            }
+            BrandId = request.BrandId
         };
 
         await _carModelRepository.UpdateAsync(updatedModel, cancellationToken);

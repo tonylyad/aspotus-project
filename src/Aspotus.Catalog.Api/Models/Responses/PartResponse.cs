@@ -1,4 +1,6 @@
-﻿namespace Aspotus.Catalog.Api.Models.Responses;
+﻿using Aspotus.Catalog.Api.Enums;
+
+namespace Aspotus.Catalog.Api.Models.Responses;
 
 /// <summary>
 /// Ответ с информацией о запчасти.
@@ -39,6 +41,31 @@ public class PartResponse
     /// Признак оригинальной запчасти.
     /// </summary>
     public bool IsOriginal { get; set; }
+
+    /// <summary>
+    /// Тип состояния запчасти.
+    /// </summary>
+    public PartConditionType ConditionType { get; set; }
+
+    /// <summary>
+    /// Процент состояния БУ-запчасти.
+    /// </summary>
+    public int? ConditionPercent { get; set; }
+
+    /// <summary>
+    /// Описание состояния БУ-запчасти.
+    /// </summary>
+    public string? ConditionDescription { get; set; }
+
+    /// <summary>
+    /// Пробег автомобиля на момент снятия БУ-запчасти.
+    /// </summary>
+    public int? MileageAtRemoval { get; set; }
+
+    /// <summary>
+    /// Список артикулов заменителей.
+    /// </summary>
+    public List<string> ReplacementArticles { get; set; } = new();
 
     /// <summary>
     /// Идентификатор категории.

@@ -72,14 +72,7 @@ public class CarGenerationService : ICarGenerationService
             Name = normalizedName,
             YearFrom = request.YearFrom,
             YearTo = request.YearTo,
-            ModelId = request.ModelId,
-            Model = new CarModel
-            {
-                Id = model.Id,
-                Name = model.Name,
-                BrandId = model.BrandId,
-                Brand = model.Brand
-            }
+            ModelId = request.ModelId
         };
 
         await _carGenerationRepository.AddAsync(entity, cancellationToken);
@@ -119,14 +112,7 @@ public class CarGenerationService : ICarGenerationService
             Name = normalizedName,
             YearFrom = request.YearFrom,
             YearTo = request.YearTo,
-            ModelId = request.ModelId,
-            Model = new CarModel
-            {
-                Id = model.Id,
-                Name = model.Name,
-                BrandId = model.BrandId,
-                Brand = model.Brand
-            }
+            ModelId = request.ModelId
         };
 
         await _carGenerationRepository.UpdateAsync(updatedGeneration, cancellationToken);

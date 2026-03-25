@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Aspotus.Catalog.Api.Enums;
 
 namespace Aspotus.Catalog.Api.Models.Requests;
 
 /// <summary>
 /// Запрос на создание новой запчасти.
 /// </summary>
-public class CreatePartRequest
+public class CreatePartRequest : IValidatableObject
 {
     /// <summary>
     /// Название запчасти.
@@ -45,6 +46,35 @@ public class CreatePartRequest
     public bool IsOriginal { get; set; }
 
     /// <summary>
+    /// Тип состояния запчасти.
+    /// </summary>
+    [Required(ErrorMessage = "Тип состояния запчасти обязателен.")]
+    public PartConditionType ConditionType { get; set; }
+
+    /// <summary>
+    /// Процент состояния БУ-запчасти.
+    /// </summary>
+    [Range(0, 100, ErrorMessage = "Процент состояния должен быть в диапазоне от 0 до 100.")]
+    public int? ConditionPercent { get; set; }
+
+    /// <summary>
+    /// Описание состояния БУ-запчасти.
+    /// </summary>
+    [StringLength(1000, ErrorMessage = "Описание состояния не должно превышать 1000 символов.")]
+    public string? ConditionDescription { get; set; }
+
+    /// <summary>
+    /// Пробег автомобиля на момент снятия БУ-запчасти.
+    /// </summary>
+    [Range(0, int.MaxValue, ErrorMessage = "Пробег не может быть отрицательным.")]
+    public int? MileageAtRemoval { get; set; }
+
+    /// <summary>
+    /// Список артикулов заменителей.
+    /// </summary>
+    public List<string> ReplacementArticles { get; set; } = new();
+
+    /// <summary>
     /// Идентификатор категории запчасти.
     /// </summary>
     [Required(ErrorMessage = "Категория запчасти обязательна.")]
@@ -55,4 +85,27 @@ public class CreatePartRequest
     /// </summary>
     [Required(ErrorMessage = "Производитель запчасти обязателен.")]
     public Guid ManufacturerId { get; set; }
+
+    /// <summary>
+    /// Выполняет дополнительную бизнес-валидацию запроса.
+    /// </summary>
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (ConditionType == PartConditionType.New)
+        {
+            if (ConditionPercent.HasValue || !string.IsNullOrWhiteSpace(ConditionDescription) || MileageAtRemoval.HasValue)
+            {
+                yield return new ValidationResult(
+                    "Для новой запчасти нельзя указывать состояние, описание состояния и пробег снятия.",
+                    new[] { nameof(ConditionPercent), nameof(ConditionDescription), nameof(MileageAtRemoval) });
+            }
+        }
+
+        if (ConditionType == PartConditionType.Used && !ConditionPercent.HasValue)
+        {
+            yield return new ValidationResult(
+                "Для БУ-запчасти необходимо указать процент состояния.",
+                new[] { nameof(ConditionPercent) });
+        }
+    }
 }

@@ -32,11 +32,29 @@ public class CreateCarRequest
     public int Year { get; set; }
 
     /// <summary>
+    /// Пробег автомобиля в километрах.
+    /// </summary>
+    [Range(0, int.MaxValue, ErrorMessage = "Пробег не может быть отрицательным.")]
+    public int Mileage { get; set; }
+
+    /// <summary>
     /// Тип кузова автомобиля.
     /// </summary>
     [Required(ErrorMessage = "Тип кузова обязателен для заполнения.")]
     [StringLength(50, MinimumLength = 2, ErrorMessage = "Тип кузова должен содержать от 2 до 50 символов.")]
     public string BodyType { get; set; } = null!;
+
+    /// <summary>
+    /// Название комплектации автомобиля.
+    /// </summary>
+    [StringLength(100, ErrorMessage = "Название комплектации не должно превышать 100 символов.")]
+    public string? TrimLevelName { get; set; }
+
+    /// <summary>
+    /// Описание комплектации автомобиля.
+    /// </summary>
+    [StringLength(1000, ErrorMessage = "Описание комплектации не должно превышать 1000 символов.")]
+    public string? TrimLevelDescription { get; set; }
 
     /// <summary>
     /// Объём двигателя автомобиля.

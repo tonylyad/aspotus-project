@@ -27,6 +27,7 @@ public class PartRepository : IPartRepository
             .AsNoTracking()
             .Include(x => x.Category)
             .Include(x => x.Manufacturer)
+            .Include(x => x.ReplacementArticles)
             .OrderBy(x => x.Name)
             .ToListAsync(cancellationToken);
     }
@@ -38,6 +39,7 @@ public class PartRepository : IPartRepository
             .AsNoTracking()
             .Include(x => x.Category)
             .Include(x => x.Manufacturer)
+            .Include(x => x.ReplacementArticles)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
@@ -47,6 +49,33 @@ public class PartRepository : IPartRepository
         return await _context.Parts
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Article == article, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyCollection<Part>> GetByCategoryIdAsync(Guid categoryId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Parts
+            .AsNoTracking()
+            .Include(x => x.Category)
+            .Include(x => x.Manufacturer)
+            .Include(x => x.ReplacementArticles)
+            .Where(x => x.CategoryId == categoryId)
+            .OrderBy(x => x.Name)
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyCollection<Part>> GetByCarIdAsync(Guid carId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Parts
+            .AsNoTracking()
+            .Include(x => x.Category)
+            .Include(x => x.Manufacturer)
+            .Include(x => x.ReplacementArticles)
+            .Include(x => x.PartCompatibilities)
+            .Where(x => x.PartCompatibilities.Any(pc => pc.CarId == carId))
+            .OrderBy(x => x.Name)
+            .ToListAsync(cancellationToken);
     }
 
     /// <inheritdoc />
@@ -75,30 +104,5 @@ public class PartRepository : IPartRepository
 
         _context.Parts.Remove(part);
         await _context.SaveChangesAsync(cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyCollection<Part>> GetByCategoryIdAsync(Guid categoryId, CancellationToken cancellationToken = default)
-    {
-        return await _context.Parts
-            .AsNoTracking()
-            .Include(x => x.Category)
-            .Include(x => x.Manufacturer)
-            .Where(x => x.CategoryId == categoryId)
-            .OrderBy(x => x.Name)
-            .ToListAsync(cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyCollection<Part>> GetByCarIdAsync(Guid carId, CancellationToken cancellationToken = default)
-    {
-        return await _context.Parts
-            .AsNoTracking()
-            .Include(x => x.Category)
-            .Include(x => x.Manufacturer)
-            .Include(x => x.PartCompatibilities)
-            .Where(x => x.PartCompatibilities.Any(pc => pc.CarId == carId))
-            .OrderBy(x => x.Name)
-            .ToListAsync(cancellationToken);
     }
 }

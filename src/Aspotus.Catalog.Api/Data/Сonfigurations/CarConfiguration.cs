@@ -48,5 +48,14 @@ public class CarConfiguration : IEntityTypeConfiguration<Car>
             .WithMany(x => x.Cars)
             .HasForeignKey(x => x.GenerationId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(x => x.Mileage)
+            .IsRequired();
+
+        builder.Property(x => x.TrimLevelName)
+            .HasMaxLength(100);
+
+        builder.Property(x => x.TrimLevelDescription)
+            .HasMaxLength(1000);
     }
 }

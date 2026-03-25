@@ -94,37 +94,21 @@ public class CarService : ICarService
             ModelId = request.ModelId,
             GenerationId = request.GenerationId,
             Year = request.Year,
+            Mileage = request.Mileage,
             BodyType = request.BodyType.Trim(),
+            TrimLevelName = string.IsNullOrWhiteSpace(request.TrimLevelName) ? null : request.TrimLevelName.Trim(),
+            TrimLevelDescription = string.IsNullOrWhiteSpace(request.TrimLevelDescription) ? null : request.TrimLevelDescription.Trim(),
             EngineVolume = request.EngineVolume,
             FuelType = request.FuelType.Trim(),
             TransmissionType = request.TransmissionType.Trim(),
-            DriveType = request.DriveType.Trim(),
-            Brand = new CarBrand
-            {
-                Id = brand.Id,
-                Name = brand.Name
-            },
-            Model = new CarModel
-            {
-                Id = model.Id,
-                Name = model.Name,
-                BrandId = model.BrandId,
-                Brand = model.Brand
-            },
-            Generation = new CarGeneration
-            {
-                Id = generation.Id,
-                Name = generation.Name,
-                YearFrom = generation.YearFrom,
-                YearTo = generation.YearTo,
-                ModelId = generation.ModelId,
-                Model = generation.Model
-            }
+            DriveType = request.DriveType.Trim()
         };
 
         await _carRepository.AddAsync(entity, cancellationToken);
 
-        return CarMapper.ToResponse(entity);
+        var createdEntity = await _carRepository.GetByIdAsync(entity.Id, cancellationToken);
+
+        return CarMapper.ToResponse(createdEntity!);
     }
 
     /// <inheritdoc />
@@ -175,37 +159,21 @@ public class CarService : ICarService
             ModelId = request.ModelId,
             GenerationId = request.GenerationId,
             Year = request.Year,
+            Mileage = request.Mileage,
             BodyType = request.BodyType.Trim(),
+            TrimLevelName = string.IsNullOrWhiteSpace(request.TrimLevelName) ? null : request.TrimLevelName.Trim(),
+            TrimLevelDescription = string.IsNullOrWhiteSpace(request.TrimLevelDescription) ? null : request.TrimLevelDescription.Trim(),
             EngineVolume = request.EngineVolume,
             FuelType = request.FuelType.Trim(),
             TransmissionType = request.TransmissionType.Trim(),
-            DriveType = request.DriveType.Trim(),
-            Brand = new CarBrand
-            {
-                Id = brand.Id,
-                Name = brand.Name
-            },
-            Model = new CarModel
-            {
-                Id = model.Id,
-                Name = model.Name,
-                BrandId = model.BrandId,
-                Brand = model.Brand
-            },
-            Generation = new CarGeneration
-            {
-                Id = generation.Id,
-                Name = generation.Name,
-                YearFrom = generation.YearFrom,
-                YearTo = generation.YearTo,
-                ModelId = generation.ModelId,
-                Model = generation.Model
-            }
+            DriveType = request.DriveType.Trim()
         };
 
         await _carRepository.UpdateAsync(updatedCar, cancellationToken);
 
-        return CarMapper.ToResponse(updatedCar);
+        var savedEntity = await _carRepository.GetByIdAsync(updatedCar.Id, cancellationToken);
+
+        return CarMapper.ToResponse(savedEntity!);
     }
 
     /// <inheritdoc />

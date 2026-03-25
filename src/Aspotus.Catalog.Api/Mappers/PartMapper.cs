@@ -24,6 +24,13 @@ public static class PartMapper
             Price = entity.Price,
             StockQuantity = entity.StockQuantity,
             IsOriginal = entity.IsOriginal,
+            ConditionType = entity.ConditionType,
+            ConditionPercent = entity.ConditionPercent,
+            ConditionDescription = entity.ConditionDescription,
+            MileageAtRemoval = entity.MileageAtRemoval,
+            ReplacementArticles = entity.ReplacementArticles
+                .Select(x => x.ReplacementArticle)
+                .ToList(),
             CategoryId = entity.CategoryId,
             CategoryName = entity.Category.Name,
             ManufacturerId = entity.ManufacturerId,

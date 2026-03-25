@@ -1,5 +1,6 @@
 ﻿using Aspotus.Catalog.Api.Data.Entities;
 using Aspotus.Catalog.Api.Data.Repositories.Interfaces;
+using Aspotus.Catalog.Api.Enums;
 using Aspotus.Catalog.Api.Exceptions;
 using Aspotus.Catalog.Api.Mappers;
 using Aspotus.Catalog.Api.Models.Requests;
@@ -22,10 +23,10 @@ public class PartService : IPartService
     /// Инициализирует новый экземпляр сервиса запчастей.
     /// </summary>
     public PartService(
-    IPartRepository partRepository,
-    IPartCategoryRepository partCategoryRepository,
-    IPartManufacturerRepository partManufacturerRepository,
-    ICarRepository carRepository)
+        IPartRepository partRepository,
+        IPartCategoryRepository partCategoryRepository,
+        IPartManufacturerRepository partManufacturerRepository,
+        ICarRepository carRepository)
     {
         _partRepository = partRepository;
         _partCategoryRepository = partCategoryRepository;
@@ -51,6 +52,36 @@ public class PartService : IPartService
         }
 
         return PartMapper.ToResponse(entity);
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyCollection<PartResponse>> GetByCategoryIdAsync(Guid categoryId, CancellationToken cancellationToken = default)
+    {
+        var category = await _partCategoryRepository.GetByIdAsync(categoryId, cancellationToken);
+
+        if (category is null)
+        {
+            throw new NotFoundException("Указанная категория запчастей не существует.");
+        }
+
+        var entities = await _partRepository.GetByCategoryIdAsync(categoryId, cancellationToken);
+
+        return entities.Select(PartMapper.ToResponse).ToList();
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyCollection<PartResponse>> GetByCarIdAsync(Guid carId, CancellationToken cancellationToken = default)
+    {
+        var car = await _carRepository.GetByIdAsync(carId, cancellationToken);
+
+        if (car is null)
+        {
+            throw new NotFoundException("Указанный автомобиль не существует.");
+        }
+
+        var entities = await _partRepository.GetByCarIdAsync(carId, cancellationToken);
+
+        return entities.Select(PartMapper.ToResponse).ToList();
     }
 
     /// <inheritdoc />
@@ -80,6 +111,8 @@ public class PartService : IPartService
             throw new NotFoundException("Указанный производитель запчасти не существует.");
         }
 
+        ValidatePartState(request.ConditionType, request.ConditionPercent, request.ConditionDescription, request.MileageAtRemoval);
+
         var entity = new Part
         {
             Id = Guid.NewGuid(),
@@ -89,15 +122,29 @@ public class PartService : IPartService
             Price = request.Price,
             StockQuantity = request.StockQuantity,
             IsOriginal = request.IsOriginal,
+            ConditionType = request.ConditionType,
+            ConditionPercent = request.ConditionPercent,
+            ConditionDescription = string.IsNullOrWhiteSpace(request.ConditionDescription) ? null : request.ConditionDescription.Trim(),
+            MileageAtRemoval = request.MileageAtRemoval,
             CategoryId = request.CategoryId,
             ManufacturerId = request.ManufacturerId,
-            Category = category,
-            Manufacturer = manufacturer
+            ReplacementArticles = request.ReplacementArticles
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Select(x => new PartReplacement
+                {
+                    Id = Guid.NewGuid(),
+                    ReplacementArticle = x
+                })
+                .ToList()
         };
 
         await _partRepository.AddAsync(entity, cancellationToken);
 
-        return PartMapper.ToResponse(entity);
+        var savedEntity = await _partRepository.GetByIdAsync(entity.Id, cancellationToken);
+
+        return PartMapper.ToResponse(savedEntity!);
     }
 
     /// <inheritdoc />
@@ -134,6 +181,8 @@ public class PartService : IPartService
             throw new NotFoundException("Указанный производитель запчасти не существует.");
         }
 
+        ValidatePartState(request.ConditionType, request.ConditionPercent, request.ConditionDescription, request.MileageAtRemoval);
+
         var updatedPart = new Part
         {
             Id = existingPart.Id,
@@ -143,15 +192,30 @@ public class PartService : IPartService
             Price = request.Price,
             StockQuantity = request.StockQuantity,
             IsOriginal = request.IsOriginal,
+            ConditionType = request.ConditionType,
+            ConditionPercent = request.ConditionPercent,
+            ConditionDescription = string.IsNullOrWhiteSpace(request.ConditionDescription) ? null : request.ConditionDescription.Trim(),
+            MileageAtRemoval = request.MileageAtRemoval,
             CategoryId = request.CategoryId,
             ManufacturerId = request.ManufacturerId,
-            Category = category,
-            Manufacturer = manufacturer
+            ReplacementArticles = request.ReplacementArticles
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Select(x => new PartReplacement
+                {
+                    Id = Guid.NewGuid(),
+                    PartId = existingPart.Id,
+                    ReplacementArticle = x
+                })
+                .ToList()
         };
 
         await _partRepository.UpdateAsync(updatedPart, cancellationToken);
 
-        return PartMapper.ToResponse(updatedPart);
+        var savedEntity = await _partRepository.GetByIdAsync(updatedPart.Id, cancellationToken);
+
+        return PartMapper.ToResponse(savedEntity!);
     }
 
     /// <inheritdoc />
@@ -169,33 +233,26 @@ public class PartService : IPartService
         return true;
     }
 
-    /// <inheritdoc />
-    public async Task<IReadOnlyCollection<PartResponse>> GetByCategoryIdAsync(Guid categoryId, CancellationToken cancellationToken = default)
+    private static void ValidatePartState(
+        PartConditionType conditionType,
+        int? conditionPercent,
+        string? conditionDescription,
+        int? mileageAtRemoval)
     {
-        var category = await _partCategoryRepository.GetByIdAsync(categoryId, cancellationToken);
-
-        if (category is null)
+        if (conditionType == PartConditionType.New)
         {
-            throw new NotFoundException("Указанная категория запчастей не существует.");
+            if (conditionPercent.HasValue || !string.IsNullOrWhiteSpace(conditionDescription) || mileageAtRemoval.HasValue)
+            {
+                throw new ValidationException("Для новой запчасти нельзя указывать состояние, описание состояния и пробег снятия.");
+            }
         }
 
-        var entities = await _partRepository.GetByCategoryIdAsync(categoryId, cancellationToken);
-
-        return entities.Select(PartMapper.ToResponse).ToList();
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyCollection<PartResponse>> GetByCarIdAsync(Guid carId, CancellationToken cancellationToken = default)
-    {
-        var car = await _carRepository.GetByIdAsync(carId, cancellationToken);
-
-        if (car is null)
+        if (conditionType == PartConditionType.Used)
         {
-            throw new NotFoundException("Указанный автомобиль не существует.");
+            if (!conditionPercent.HasValue)
+            {
+                throw new ValidationException("Для БУ-запчасти необходимо указать процент состояния.");
+            }
         }
-
-        var entities = await _partRepository.GetByCarIdAsync(carId, cancellationToken);
-
-        return entities.Select(PartMapper.ToResponse).ToList();
     }
 }
