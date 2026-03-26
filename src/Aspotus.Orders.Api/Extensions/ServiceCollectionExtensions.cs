@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi;
+﻿using System.Reflection;
+using Microsoft.OpenApi;
 
 namespace Aspotus.Orders.Api.Extensions
 {
@@ -9,13 +10,12 @@ namespace Aspotus.Orders.Api.Extensions
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "Aspotus Orders API",
-                    Version = "v1",
-                    Description = "Orders Api for Aspotus project"
-                });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+                options.IncludeXmlComments(xmlPath);
             });
+
 
             return services;
         }
