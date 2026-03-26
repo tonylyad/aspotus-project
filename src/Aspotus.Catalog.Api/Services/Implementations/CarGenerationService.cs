@@ -77,7 +77,9 @@ public class CarGenerationService : ICarGenerationService
 
         await _carGenerationRepository.AddAsync(entity, cancellationToken);
 
-        return CarGenerationMapper.ToResponse(entity);
+        var savedEntity = await _carGenerationRepository.GetByIdAsync(entity.Id, cancellationToken);
+
+        return CarGenerationMapper.ToResponse(savedEntity);
     }
 
     /// <inheritdoc />
@@ -117,7 +119,9 @@ public class CarGenerationService : ICarGenerationService
 
         await _carGenerationRepository.UpdateAsync(updatedGeneration, cancellationToken);
 
-        return CarGenerationMapper.ToResponse(updatedGeneration);
+        var savedEntity = await _carGenerationRepository.GetByIdAsync(updatedGeneration.Id, cancellationToken);
+
+        return CarGenerationMapper.ToResponse(savedEntity!);
     }
 
     /// <inheritdoc />

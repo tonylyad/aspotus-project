@@ -106,9 +106,9 @@ public class CarService : ICarService
 
         await _carRepository.AddAsync(entity, cancellationToken);
 
-        var createdEntity = await _carRepository.GetByIdAsync(entity.Id, cancellationToken);
+        var savedEntity = await _carRepository.GetByIdAsync(entity.Id, cancellationToken);
 
-        return CarMapper.ToResponse(createdEntity!);
+        return CarMapper.ToResponse(savedEntity!);
     }
 
     /// <inheritdoc />

@@ -75,7 +75,9 @@ public class CarModelService : ICarModelService
 
         await _carModelRepository.AddAsync(entity, cancellationToken);
 
-        return CarModelMapper.ToResponse(entity);
+        var savedEntity = await _carModelRepository.GetByIdAsync(entity.Id, cancellationToken);
+
+        return CarModelMapper.ToResponse(savedEntity!);
     }
 
     /// <inheritdoc />
@@ -113,7 +115,9 @@ public class CarModelService : ICarModelService
 
         await _carModelRepository.UpdateAsync(updatedModel, cancellationToken);
 
-        return CarModelMapper.ToResponse(updatedModel);
+        var savedEntity = await _carModelRepository.GetByIdAsync(updatedModel.Id, cancellationToken);
+
+        return CarModelMapper.ToResponse(savedEntity!);
     }
 
     /// <inheritdoc />
