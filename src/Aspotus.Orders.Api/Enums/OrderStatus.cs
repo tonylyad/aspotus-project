@@ -8,20 +8,20 @@ public enum OrderStatus
     /// <summary>
     /// Заказ создан.
     /// </summary>
-    Created = 1,
+    Created = 10,
 
     /// <summary>
     /// Заказ в обработке.
     /// </summary>
-    Processing = 2,
+    Processing = 20,
 
     /// <summary>
     /// Заказ завершён.
     /// </summary>
-    Completed = 3,
+    Completed = 30,
 
     /// <summary>
     /// Заказ отменён.
     /// </summary>
-    Cancelled = 4
+    Cancelled = 40,
 }
