@@ -14,5 +14,6 @@
   </Folder>
   <Folder Name="/tests/">
     <File Path="tests/README.md" />
+    <Project Path="tests/Unit.Test/Unit.Test.csproj" Id="6e556d7f-b737-48af-8c39-b1e7f25c48fc" />
   </Folder>
 </Solution>
