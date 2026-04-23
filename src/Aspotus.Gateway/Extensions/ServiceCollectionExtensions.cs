@@ -1,20 +1,19 @@
 ﻿using System.Reflection;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.OpenApi;
 
-namespace Aspotus.Catalog.Api.Extensions;
+namespace Aspotus.Gateway.Extensions;
 
 /// <summary>
-/// Содержит методы расширения для регистрации сервисов приложения.
+/// Методы расширения для регистрации сервисов Gateway.
 /// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Регистрирует Swagger для API каталога.
+    /// Регистрирует Swagger для Gateway.
     /// </summary>
     /// <param name="services">Коллекция сервисов приложения.</param>
     /// <returns>Коллекция сервисов приложения.</returns>
-    public static IServiceCollection AddCatalogApiSwagger(this IServiceCollection services)
+    public static IServiceCollection AddGatewaySwagger(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
 
@@ -22,18 +21,26 @@ public static class ServiceCollectionExtensions
         {
             options.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "Aspotus Catalog API",
+                Title = "Aspotus Gateway API",
                 Version = "v1",
                 Description = """
-API каталога.
+Главная точка входа в систему Aspotus.
 
-⚠ Используется только через Gateway:
+Все запросы должны отправляться через Gateway.
 
-Префикс:
-- /catalog
+Доступные префиксы:
 
-Пример:
-GET /catalog/api/brands
+- /catalog — API каталога
+- /orders — API заказов
+
+Аутентификация:
+- JWT Bearer Token
+
+Роли:
+- Customer
+- ContentModerator
+- Operator
+- Admin
 """
             });
 
@@ -45,7 +52,9 @@ GET /catalog/api/brands
                 options.IncludeXmlComments(xmlPath);
             }
 
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            const string schemeId = "Bearer";
+
+            options.AddSecurityDefinition(schemeId, new OpenApiSecurityScheme
             {
                 Name = "Authorization",
                 Type = SecuritySchemeType.Http,
@@ -54,19 +63,36 @@ GET /catalog/api/brands
                 In = ParameterLocation.Header,
                 Description = "Введите JWT токен в формате: Bearer {token}"
             });
+
+            options.AddSecurityRequirement(document =>
+            {
+                var requirement = new OpenApiSecurityRequirement();
+
+                requirement.Add(
+                    new OpenApiSecuritySchemeReference(schemeId),
+                    new List<string>()
+                );
+
+                return requirement;
+            });
         });
 
-        services.Configure<ForwardedHeadersOptions>(options =>
-        {
-            options.ForwardedHeaders =
-                ForwardedHeaders.XForwardedFor |
-                ForwardedHeaders.XForwardedProto |
-                ForwardedHeaders.XForwardedHost |
-                ForwardedHeaders.XForwardedPrefix;
+        return services;
+    }
 
-            options.KnownNetworks.Clear();
-            options.KnownProxies.Clear();
-        });
+    /// <summary>
+    /// Регистрирует reverse proxy для Gateway.
+    /// </summary>
+    /// <param name="services">Коллекция сервисов приложения.</param>
+    /// <param name="configuration">Конфигурация приложения.</param>
+    /// <returns>Коллекция сервисов приложения.</returns>
+    public static IServiceCollection AddGatewayProxy(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services
+            .AddReverseProxy()
+            .LoadFromConfig(configuration.GetSection("ReverseProxy"));
 
         return services;
     }

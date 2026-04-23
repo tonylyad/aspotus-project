@@ -18,16 +18,11 @@ public static class ApplicationBuilderExtensions
         {
             options.DocumentTitle = "Aspotus API Gateway";
 
-            // Человек сразу понимает структуру
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "Gateway (Auth / Users / Roles)");
-
             options.SwaggerEndpoint("/catalog/swagger/v1/swagger.json", "Catalog (через /catalog)");
-
             options.SwaggerEndpoint("/orders/swagger/v1/swagger.json", "Orders (через /orders)");
 
             options.RoutePrefix = "swagger";
-
-            // Важно: сразу открывать gateway
             options.DefaultModelsExpandDepth(-1);
         });
 
