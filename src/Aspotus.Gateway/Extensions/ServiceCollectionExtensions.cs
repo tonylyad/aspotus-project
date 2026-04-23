@@ -61,10 +61,10 @@ public static class ServiceCollectionExtensions
                 Scheme = "bearer",
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
-                Description = "Введите JWT токен в формате: Bearer {token}"
+                Description = "Вставьте только JWT токен без слова Bearer. Swagger добавит Bearer автоматически."
             });
 
-            options.AddSecurityRequirement(document =>
+            options.AddSecurityRequirement(_ =>
             {
                 var requirement = new OpenApiSecurityRequirement();
 

@@ -138,4 +138,23 @@ public class AuthController : ControllerBase
             ExpiresAtUtc = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpiresInMinutes)
         });
     }
+
+    /// <summary>
+    /// Возвращает claims текущего пользователя.
+    /// </summary>
+    /// <returns>Список claims текущего пользователя.</returns>
+    [Authorize]
+    [HttpGet("me")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public IActionResult Me()
+    {
+        var claims = User.Claims.Select(x => new
+        {
+            x.Type,
+            x.Value
+        });
+
+        return Ok(claims);
+    }
 }

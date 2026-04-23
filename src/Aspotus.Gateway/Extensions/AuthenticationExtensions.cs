@@ -2,6 +2,7 @@
 using Aspotus.Gateway.Services.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 namespace Aspotus.Gateway.Extensions;
@@ -36,6 +37,8 @@ public static class AuthenticationExtensions
             })
             .AddJwtBearer(options =>
             {
+                options.MapInboundClaims = false;
+
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -49,7 +52,10 @@ public static class AuthenticationExtensions
                         Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),
 
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero,
+
+                    NameClaimType = ClaimTypes.Name,
+                    RoleClaimType = ClaimTypes.Role
                 };
             });
 
