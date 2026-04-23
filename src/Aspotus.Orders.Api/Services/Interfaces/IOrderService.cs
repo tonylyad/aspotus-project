@@ -27,12 +27,30 @@ public interface IOrderService
     /// <summary>
     /// Создаёт новый заказ на запчасти.
     /// </summary>
-    Task<OrderResponse> CreatePartOrderAsync(CreatePartOrderRequest request, CancellationToken cancellationToken = default);
+    /// <param name="request">Данные для создания заказа.</param>
+    /// <param name="userId">Идентификатор авторизованного пользователя из gateway.</param>
+    /// <param name="userEmail">Электронная почта авторизованного пользователя из gateway.</param>
+    /// <param name="userFullName">Полное имя авторизованного пользователя из gateway.</param>
+    Task<OrderResponse> CreatePartOrderAsync(
+        CreatePartOrderRequest request,
+        string? userId,
+        string? userEmail,
+        string? userFullName,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Создаёт новый заказ на автомобиль.
     /// </summary>
-    Task<OrderResponse> CreateCarOrderAsync(CreateCarOrderRequest request, CancellationToken cancellationToken = default);
+    /// <param name="request">Данные для создания заказа.</param>
+    /// <param name="userId">Идентификатор авторизованного пользователя из gateway.</param>
+    /// <param name="userEmail">Электронная почта авторизованного пользователя из gateway.</param>
+    /// <param name="userFullName">Полное имя авторизованного пользователя из gateway.</param>
+    Task<OrderResponse> CreateCarOrderAsync(
+        CreateCarOrderRequest request,
+        string? userId,
+        string? userEmail,
+        string? userFullName,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Удаляет заказ по идентификатору.

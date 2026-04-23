@@ -1,18 +1,35 @@
 ﻿namespace Aspotus.Gateway.Extensions;
 
+/// <summary>
+/// Методы расширения для настройки middleware Gateway.
+/// </summary>
 public static class ApplicationBuilderExtensions
 {
-    public static WebApplication UseGatewaySwagger(this WebApplication app)
+    /// <summary>
+    /// Подключает Swagger и Swagger UI для Gateway.
+    /// </summary>
+    /// <param name="app">Построитель приложения.</param>
+    /// <returns>Построитель приложения.</returns>
+    public static IApplicationBuilder UseGatewaySwagger(this IApplicationBuilder app)
     {
-        if (app.Environment.IsDevelopment())
+        app.UseSwagger();
+
+        app.UseSwaggerUI(options =>
         {
-            app.UseSwagger();
-            app.UseSwaggerUI(options =>
-            {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Aspotus Gateway API v1");
-                options.RoutePrefix = "swagger";
-            });
-        }
+            options.DocumentTitle = "Aspotus API Gateway";
+
+            // Человек сразу понимает структуру
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Gateway (Auth / Users / Roles)");
+
+            options.SwaggerEndpoint("/catalog/swagger/v1/swagger.json", "Catalog (через /catalog)");
+
+            options.SwaggerEndpoint("/orders/swagger/v1/swagger.json", "Orders (через /orders)");
+
+            options.RoutePrefix = "swagger";
+
+            // Важно: сразу открывать gateway
+            options.DefaultModelsExpandDepth(-1);
+        });
 
         return app;
     }

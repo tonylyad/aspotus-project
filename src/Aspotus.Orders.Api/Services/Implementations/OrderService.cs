@@ -60,6 +60,9 @@ public class OrderService : IOrderService
     /// <inheritdoc />
     public async Task<OrderResponse> CreatePartOrderAsync(
         CreatePartOrderRequest request,
+        string? userId,
+        string? userEmail,
+        string? userFullName,
         CancellationToken cancellationToken = default)
     {
         if (request.Items is null || request.Items.Count == 0)
@@ -70,9 +73,9 @@ public class OrderService : IOrderService
         var order = new Order
         {
             Id = Guid.NewGuid(),
-            UserId = request.UserId,
-            UserEmail = string.IsNullOrWhiteSpace(request.UserEmail) ? null : request.UserEmail.Trim(),
-            UserFullName = string.IsNullOrWhiteSpace(request.UserFullName) ? null : request.UserFullName.Trim(),
+            UserId = ParseUserId(userId),
+            UserEmail = string.IsNullOrWhiteSpace(userEmail) ? null : userEmail.Trim(),
+            UserFullName = string.IsNullOrWhiteSpace(userFullName) ? null : userFullName.Trim(),
             CustomerName = request.CustomerName.Trim(),
             CustomerEmail = request.CustomerEmail.Trim(),
             CustomerPhone = request.CustomerPhone.Trim(),
@@ -102,6 +105,9 @@ public class OrderService : IOrderService
     /// <inheritdoc />
     public async Task<OrderResponse> CreateCarOrderAsync(
         CreateCarOrderRequest request,
+        string? userId,
+        string? userEmail,
+        string? userFullName,
         CancellationToken cancellationToken = default)
     {
         if (request.Car is null)
@@ -112,9 +118,9 @@ public class OrderService : IOrderService
         var order = new Order
         {
             Id = Guid.NewGuid(),
-            UserId = request.UserId,
-            UserEmail = string.IsNullOrWhiteSpace(request.UserEmail) ? null : request.UserEmail.Trim(),
-            UserFullName = string.IsNullOrWhiteSpace(request.UserFullName) ? null : request.UserFullName.Trim(),
+            UserId = ParseUserId(userId),
+            UserEmail = string.IsNullOrWhiteSpace(userEmail) ? null : userEmail.Trim(),
+            UserFullName = string.IsNullOrWhiteSpace(userFullName) ? null : userFullName.Trim(),
             CustomerName = request.CustomerName.Trim(),
             CustomerEmail = request.CustomerEmail.Trim(),
             CustomerPhone = request.CustomerPhone.Trim(),
@@ -157,5 +163,22 @@ public class OrderService : IOrderService
         await _orderRepository.DeleteAsync(id, cancellationToken);
 
         return true;
+    }
+
+    /// <summary>
+    /// Преобразует строковый идентификатор пользователя из gateway в Guid.
+    /// </summary>
+    /// <param name="userId">Строковый идентификатор пользователя.</param>
+    /// <returns>Идентификатор пользователя в формате Guid или null, если значение отсутствует или некорректно.</returns>
+    private static Guid? ParseUserId(string? userId)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return null;
+        }
+
+        return Guid.TryParse(userId, out var parsedUserId)
+            ? parsedUserId
+            : null;
     }
 }

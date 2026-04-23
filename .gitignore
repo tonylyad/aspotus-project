@@ -26,5 +26,3 @@ packages/
 *.db-shm
 *.db-wal
 
-# EF Core migrations
-**/Migrations/

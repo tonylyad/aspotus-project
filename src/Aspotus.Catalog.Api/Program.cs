@@ -1,4 +1,3 @@
-using System.Reflection;
 using Aspotus.Catalog.Api.Data.Context;
 using Aspotus.Catalog.Api.Data.Repositories.Implementations;
 using Aspotus.Catalog.Api.Data.Repositories.Interfaces;
@@ -11,14 +10,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-
-    options.IncludeXmlComments(xmlPath);
-});
+builder.Services.AddCatalogApiSwagger();
 
 builder.Services.AddDbContext<CatalogDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("CatalogDb")));
@@ -46,12 +38,12 @@ builder.Services.AddScoped<IPartService, PartService>();
 
 var app = builder.Build();
 
+app.UseCatalogApiForwardedHeaders();
 app.UseExceptionHandling();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseCatalogApiSwagger();
 }
 
 app.UseHttpsRedirection();

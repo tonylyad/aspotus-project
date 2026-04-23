@@ -8,22 +8,6 @@ namespace Aspotus.Orders.Api.Models.Requests;
 public class CreateCarOrderRequest
 {
     /// <summary>
-    /// Идентификатор пользователя, оформляющего заказ.
-    /// </summary>
-    public Guid? UserId { get; set; }
-
-    /// <summary>
-    /// Электронная почта пользователя.
-    /// </summary>
-    [EmailAddress(ErrorMessage = "Некорректный формат электронной почты.")]
-    public string? UserEmail { get; set; }
-
-    /// <summary>
-    /// Имя пользователя.
-    /// </summary>
-    public string? UserFullName { get; set; }
-
-    /// <summary>
     /// Имя клиента, оформляющего заказ.
     /// </summary>
     [Required(ErrorMessage = "Имя клиента обязательно для заполнения.")]
