@@ -34,7 +34,7 @@ public class OrdersController : ControllerBase
         if (!HttpContext.HasGatewayRole("Operator") &&
             !HttpContext.HasGatewayRole("Admin"))
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
 
         var result = await _orderService.GetAllAsync(cancellationToken);
@@ -59,14 +59,14 @@ public class OrdersController : ControllerBase
         {
             if (!isCustomer)
             {
-                return Forbid();
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
             var currentUserId = HttpContext.GetGatewayUserId();
 
             if (!Guid.TryParse(currentUserId, out var parsedCurrentUserId) || parsedCurrentUserId != userId)
             {
-                return Forbid();
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
         }
 
@@ -87,7 +87,7 @@ public class OrdersController : ControllerBase
         if (!HttpContext.HasGatewayRole("Operator") &&
             !HttpContext.HasGatewayRole("Admin"))
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
 
         var result = await _orderService.GetByIdAsync(id, cancellationToken);
@@ -116,7 +116,7 @@ public class OrdersController : ControllerBase
             !HttpContext.HasGatewayRole("Operator") &&
             !HttpContext.HasGatewayRole("Admin"))
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
 
         var result = await _orderService.CreatePartOrderAsync(
@@ -145,7 +145,7 @@ public class OrdersController : ControllerBase
             !HttpContext.HasGatewayRole("Operator") &&
             !HttpContext.HasGatewayRole("Admin"))
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
 
         var result = await _orderService.CreateCarOrderAsync(
@@ -170,7 +170,7 @@ public class OrdersController : ControllerBase
     {
         if (!HttpContext.HasGatewayRole("Admin"))
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
 
         var deleted = await _orderService.DeleteAsync(id, cancellationToken);

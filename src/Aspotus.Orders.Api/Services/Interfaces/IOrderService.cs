@@ -45,6 +45,7 @@ public interface IOrderService
     /// <param name="userId">Идентификатор авторизованного пользователя из gateway.</param>
     /// <param name="userEmail">Электронная почта авторизованного пользователя из gateway.</param>
     /// <param name="userFullName">Полное имя авторизованного пользователя из gateway.</param>
+    /// <param name="cancellationToken">Токен отмены операции.</param>
     Task<OrderResponse> CreateCarOrderAsync(
         CreateCarOrderRequest request,
         string? userId,

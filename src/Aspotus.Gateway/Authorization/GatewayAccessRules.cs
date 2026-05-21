@@ -46,7 +46,7 @@ public static class GatewayAccessRules
             {
                 PathPrefix = "/orders/api/orders",
                 Methods = new[] { "GET" },
-                AllowedRoles = new[] { "Operator", "Admin", "Customer" }
+                AllowedRoles = new[] { "Operator", "Admin" }
             },
 
             // Orders: удаление — только админ

@@ -42,11 +42,18 @@ public static class ApplicationBuilderExtensions
         {
             options.PreSerializeFilters.Add((swagger, httpReq) =>
             {
+                var isBehindGateway =
+                    httpReq.Path.StartsWithSegments("/orders", StringComparison.OrdinalIgnoreCase) ||
+                    httpReq.Headers.ContainsKey("X-Forwarded-Host") ||
+                    httpReq.Headers.ContainsKey("X-Forwarded-For");
+
+                var basePath = isBehindGateway ? "/orders" : string.Empty;
+
                 swagger.Servers = new List<OpenApiServer>
                 {
                     new()
                     {
-                        Url = $"{httpReq.Scheme}://{httpReq.Host}/orders"
+                        Url = $"{httpReq.Scheme}://{httpReq.Host}{basePath}"
                     }
                 };
             });

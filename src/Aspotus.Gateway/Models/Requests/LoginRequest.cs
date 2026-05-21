@@ -8,11 +8,10 @@ namespace Aspotus.Gateway.Models.Requests;
 public class LoginRequest
 {
     /// <summary>
-    /// Адрес электронной почты пользователя.
+    /// Логин пользователя.
     /// </summary>
     [Required]
-    [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+    public string Login { get; set; } = string.Empty;
 
     /// <summary>
     /// Пароль пользователя.

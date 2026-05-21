@@ -20,7 +20,6 @@ public static class UserHeadersTransform
 
         var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
         var email = context.User.FindFirstValue(ClaimTypes.Email);
-        var fullName = context.User.FindFirstValue(ClaimTypes.Name);
         var roles = context.User.FindAll(ClaimTypes.Role).Select(x => x.Value).ToArray();
 
         if (!string.IsNullOrWhiteSpace(userId))
@@ -31,11 +30,6 @@ public static class UserHeadersTransform
         if (!string.IsNullOrWhiteSpace(email))
         {
             context.Request.Headers["X-User-Email"] = email;
-        }
-
-        if (!string.IsNullOrWhiteSpace(fullName))
-        {
-            context.Request.Headers["X-User-FullName"] = fullName;
         }
 
         if (roles.Length > 0)

@@ -32,34 +32,43 @@ public static class GatewaySeedData
             }
         }
 
+        const string adminLogin = "admin";
         const string adminEmail = "admin@aspotus.com";
         const string adminPassword = "123456";
 
-        var admin = await userManager.FindByEmailAsync(adminEmail);
+        var admin = await userManager.FindByNameAsync(adminLogin);
+
         if (admin is null)
         {
-            admin = new ApplicationUser
-            {
-                Email = adminEmail,
-                UserName = adminEmail,
-                FullName = "System Administrator"
-            };
+            admin = await userManager.FindByEmailAsync(adminEmail);
 
-            var createResult = await userManager.CreateAsync(admin, adminPassword);
-
-            if (createResult.Succeeded)
+            if (admin is not null)
             {
-                await userManager.AddToRoleAsync(admin, "Admin");
+                admin.UserName = adminLogin;
+                admin.FullName = "Главный админ";
+                await userManager.UpdateAsync(admin);
+            }
+            else
+            {
+                admin = new ApplicationUser
+                {
+                    UserName = adminLogin,
+                    Email = adminEmail,
+                    FullName = "Главный админ"
+                };
+
+                var createResult = await userManager.CreateAsync(admin, adminPassword);
             }
         }
         else
         {
-            var adminRoles = await userManager.GetRolesAsync(admin);
+            admin.FullName = "Главный админ";
+            await userManager.UpdateAsync(admin);
+        }
 
-            if (!adminRoles.Contains("Admin"))
-            {
-                await userManager.AddToRoleAsync(admin, "Admin");
-            }
+        if (admin is not null && !await userManager.IsInRoleAsync(admin, "Admin"))
+        {
+            await userManager.AddToRoleAsync(admin, "Admin");
         }
     }
 }

@@ -29,6 +29,15 @@ public static class ProxyExtensions
                     {
                         if (context.User.Identity?.IsAuthenticated != true)
                         {
+                            var acceptsHtml = context.Request.Headers.Accept.ToString()
+                                .Contains("text/html", StringComparison.OrdinalIgnoreCase);
+
+                            if (acceptsHtml)
+                            {
+                                context.Response.Redirect("/login.html");
+                                return;
+                            }
+
                             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                             await context.Response.WriteAsJsonAsync(new
                             {

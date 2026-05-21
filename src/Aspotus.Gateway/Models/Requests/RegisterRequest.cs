@@ -8,6 +8,12 @@ namespace Aspotus.Gateway.Models.Requests;
 public class RegisterRequest
 {
     /// <summary>
+    /// Логин пользователя.
+    /// </summary>
+    [Required]
+    public string Login { get; set; } = string.Empty;
+
+    /// <summary>
     /// Адрес электронной почты пользователя.
     /// </summary>
     [Required]
@@ -26,4 +32,9 @@ public class RegisterRequest
     /// </summary>
     [Required]
     public string FullName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Номер телефона пользователя.
+    /// </summary>
+    public string? PhoneNumber { get; set; }
 }
