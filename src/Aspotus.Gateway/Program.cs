@@ -10,6 +10,17 @@ builder.Services.AddGatewayProxy(builder.Configuration);
 builder.Services.AddGatewayIdentity(builder.Configuration);
 builder.Services.AddGatewayAuthentication(builder.Configuration);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ReactPolicy", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -23,6 +34,8 @@ using (var scope = app.Services.CreateScope())
 app.UseGatewaySwagger();
 
 app.UseHttpsRedirection();
+
+app.UseCors("ReactPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
