@@ -11,6 +11,11 @@ public class UserResponse
     public string Id { get; set; } = string.Empty;
 
     /// <summary>
+    /// Логин пользователя.
+    /// </summary>
+    public string Login { get; set; } = string.Empty;
+
+    /// <summary>
     /// Адрес электронной почты пользователя.
     /// </summary>
     public string Email { get; set; } = string.Empty;
@@ -19,6 +24,11 @@ public class UserResponse
     /// Полное имя пользователя.
     /// </summary>
     public string FullName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Номер телефона пользователя.
+    /// </summary>
+    public string PhoneNumber { get; set; } = string.Empty;
 
     /// <summary>
     /// Список ролей пользователя.

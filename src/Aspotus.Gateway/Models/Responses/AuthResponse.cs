@@ -11,6 +11,11 @@ public class AuthResponse
     public string Token { get; set; } = string.Empty;
 
     /// <summary>
+    /// Логин пользователя.
+    /// </summary>
+    public string Login { get; set; } = string.Empty;
+
+    /// <summary>
     /// Электронная почта пользователя.
     /// </summary>
     public string Email { get; set; } = string.Empty;
@@ -19,6 +24,16 @@ public class AuthResponse
     /// Полное имя пользователя.
     /// </summary>
     public string FullName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Номер телефона пользователя.
+    /// </summary>
+    public string PhoneNumber { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Роли пользователя.
+    /// </summary>
+    public List<string> Roles { get; set; } = new();
 
     /// <summary>
     /// Дата и время окончания срока действия токена в UTC.

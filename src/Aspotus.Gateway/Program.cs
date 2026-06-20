@@ -1,5 +1,7 @@
+using Aspotus.Gateway.Data.Context;
 using Aspotus.Gateway.Data.Seed;
 using Aspotus.Gateway.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,12 +30,17 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var context = scope.ServiceProvider.GetRequiredService<GatewayDbContext>();
+    
+    await context.Database.MigrateAsync();
     await GatewaySeedData.SeedAsync(services);
 }
 
+
 app.UseGatewaySwagger();
 
-app.UseHttpsRedirection();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseCors("ReactPolicy");
 

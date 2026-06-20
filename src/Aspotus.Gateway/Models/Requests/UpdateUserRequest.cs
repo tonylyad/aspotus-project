@@ -1,31 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aspotus.Gateway.Models.Requests;
 
 /// <summary>
-/// Запрос на создание пользователя администратором.
+/// Запрос на обновление пользователя.
 /// </summary>
-public class CreateUserRequest
+public class UpdateUserRequest
 {
-    /// <summary>
-    /// Логин пользователя.
-    /// </summary>
-    [Required]
-    public string Login { get; set; } = string.Empty;
-
     /// <summary>
     /// Адрес электронной почты пользователя.
     /// </summary>
     [Required]
     [EmailAddress]
     public string Email { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Пароль пользователя.
-    /// </summary>
-    [Required]
-    [MinLength(6)]
-    public string Password { get; set; } = string.Empty;
 
     /// <summary>
     /// Полное имя пользователя.

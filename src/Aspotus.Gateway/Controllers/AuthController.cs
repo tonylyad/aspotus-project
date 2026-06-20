@@ -58,11 +58,21 @@ public class AuthController : ControllerBase
             });
         }
 
+        var existingLogin = await _userManager.FindByNameAsync(request.Login);
+        if (existingLogin is not null)
+        {
+            return BadRequest(new
+            {
+                message = "Пользователь с таким логином уже существует."
+            });
+        }
+
         var user = new ApplicationUser
         {
-            UserName = request.Email,
+            UserName = request.Login,
             Email = request.Email,
-            FullName = request.FullName
+            FullName = request.FullName,
+            PhoneNumber = request.PhoneNumber
         };
 
         var createResult = await _userManager.CreateAsync(user, request.Password);
@@ -92,8 +102,10 @@ public class AuthController : ControllerBase
         return Ok(new AuthResponse
         {
             Token = token,
+            Login = user.UserName ?? string.Empty,
             Email = user.Email ?? string.Empty,
             FullName = user.FullName ?? string.Empty,
+            PhoneNumber = user.PhoneNumber ?? string.Empty,
             ExpiresAtUtc = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpiresInMinutes)
         });
     }
@@ -109,7 +121,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email);
+        var user = await _userManager.FindByNameAsync(request.Login);
         if (user is null)
         {
             return Unauthorized(new
@@ -133,8 +145,65 @@ public class AuthController : ControllerBase
         return Ok(new AuthResponse
         {
             Token = token,
+            Login = user.UserName ?? string.Empty,
             Email = user.Email ?? string.Empty,
             FullName = user.FullName ?? string.Empty,
+            PhoneNumber = user.PhoneNumber ?? string.Empty,
+            ExpiresAtUtc = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpiresInMinutes)
+        });
+    }
+
+    /// <summary>
+    /// Выполняет вход администратора и возвращает JWT-токен.
+    /// </summary>
+    /// <param name="request">Данные для входа администратора.</param>
+    /// <returns>JWT-токен и информация об авторизованном администраторе.</returns>
+    [AllowAnonymous]
+    [HttpPost("admin-login")]
+    [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<AuthResponse>> AdminLogin([FromBody] AdminLoginRequest request)
+    {
+        var user = await _userManager.FindByNameAsync(request.Login);
+        if (user is null)
+        {
+            return Unauthorized(new
+            {
+                message = "Неверный логин или пароль."
+            });
+        }
+
+        var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+
+        if (!result.Succeeded)
+        {
+            return Unauthorized(new
+            {
+                message = "Неверный логин или пароль."
+            });
+        }
+
+        var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+        var isOperator = await _userManager.IsInRoleAsync(user, "Operator");
+        if (!isAdmin && !isOperator)
+        {
+            return Unauthorized(new
+            {
+                message = "Доступ разрешён только администраторам и операторам."
+            });
+        }
+
+        var token = await _tokenService.GenerateTokenAsync(user);
+        var roles = (await _userManager.GetRolesAsync(user)).ToList();
+
+        return Ok(new AuthResponse
+        {
+            Token = token,
+            Login = user.UserName ?? string.Empty,
+            Email = user.Email ?? string.Empty,
+            FullName = user.FullName ?? string.Empty,
+            PhoneNumber = user.PhoneNumber ?? string.Empty,
+            Roles = roles,
             ExpiresAtUtc = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpiresInMinutes)
         });
     }
