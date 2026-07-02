@@ -16,7 +16,7 @@ services:
     ports:
       - "5115:5115"
   
-  consumerforoderservice:
+  gateway:
     image: ${DOCKER_REGISTRY-}gateway
     build:
       context: .
