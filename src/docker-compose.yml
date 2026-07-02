@@ -1,0 +1,29 @@
+services:
+
+  catalog-api:
+    image: ${DOCKER_REGISTRY-}catalog-api
+    build:
+      context: .
+      dockerfile: Aspotus.Catalog.Api/Dockerfile
+    ports:
+      - "5299:5299"
+
+  orders-api:
+    image: ${DOCKER_REGISTRY-}orders-api
+    build:
+      context: .
+      dockerfile: Aspotus.Orders.Api/Dockerfile
+    ports:
+      - "5115:5115"
+  
+  consumerforoderservice:
+    image: ${DOCKER_REGISTRY-}gateway
+    build:
+      context: .
+      dockerfile: Aspotus.Gateway/Dockerfile
+    depends_on:
+      - catalog-api
+      - orders-api
+    ports:
+      - "5230:5230"
+
