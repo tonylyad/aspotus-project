@@ -1,3 +1,4 @@
+name: aspotus-project
 services:
 
   catalog-api:
@@ -7,6 +8,9 @@ services:
       dockerfile: Aspotus.Catalog.Api/Dockerfile
     ports:
       - "5299:5299"
+  #  networks:
+  #    - backend
+
 
   orders-api:
     image: ${DOCKER_REGISTRY-}orders-api
@@ -15,6 +19,9 @@ services:
       dockerfile: Aspotus.Orders.Api/Dockerfile
     ports:
       - "5115:5115"
+  #  networks:
+  #    - backend
+
   
   gateway:
     image: ${DOCKER_REGISTRY-}gateway
@@ -26,4 +33,9 @@ services:
       - orders-api
     ports:
       - "5230:5230"
+ #   networks:
+ #     - backend
 
+#networks:
+#  backend:
+#    driver: bridge
