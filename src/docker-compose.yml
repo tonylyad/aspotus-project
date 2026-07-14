@@ -8,8 +8,8 @@ services:
       dockerfile: Aspotus.Catalog.Api/Dockerfile
     ports:
       - "5299:5299"
-  #  networks:
-  #    - backend
+    networks:
+      - backend
 
 
   orders-api:
@@ -19,8 +19,8 @@ services:
       dockerfile: Aspotus.Orders.Api/Dockerfile
     ports:
       - "5115:5115"
-  #  networks:
-  #    - backend
+    networks:
+      - backend
 
   
   gateway:
@@ -32,10 +32,10 @@ services:
       - catalog-api
       - orders-api
     ports:
+      - "7227:7227"
       - "5230:5230"
- #   networks:
- #     - backend
+    networks:
+      - backend
 
-#networks:
-#  backend:
-#    driver: bridge
+networks:
+  backend:
