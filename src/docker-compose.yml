@@ -7,6 +7,7 @@ services:
       context: .
       dockerfile: Aspotus.Catalog.Api/Dockerfile
     ports:
+      - "7195:7195"
       - "5299:5299"
     networks:
       - backend
@@ -18,6 +19,7 @@ services:
       context: .
       dockerfile: Aspotus.Orders.Api/Dockerfile
     ports:
+      - "7026:7026"
       - "5115:5115"
     networks:
       - backend
