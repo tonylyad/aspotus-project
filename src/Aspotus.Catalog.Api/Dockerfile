@@ -25,6 +25,5 @@ RUN dotnet publish "./Aspotus.Catalog.Api.csproj" -c $BUILD_CONFIGURATION -o /ap
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-EXPOSE 7195
 EXPOSE 5299
 ENTRYPOINT ["dotnet", "Aspotus.Catalog.Api.dll"]
