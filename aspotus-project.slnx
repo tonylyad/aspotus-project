@@ -6,6 +6,7 @@
     <File Path="docs/README.md" />
   </Folder>
   <Folder Name="/src/">
+    <File Path="src/docker-compose.yml" />
     <File Path="src/README.md" />
     <Project Path="src/Aspotus.Catalog.Api/Aspotus.Catalog.Api.csproj" />
     <Project Path="src/Aspotus.Gateway/Aspotus.Gateway.csproj" />

@@ -6,6 +6,7 @@ using Aspotus.Catalog.Api.Extensions;
 using Aspotus.Catalog.Api.Services.Implementations;
 using Aspotus.Catalog.Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,19 @@ builder.Services.AddScoped<IPartManufacturerService, PartManufacturerService>();
 builder.Services.AddScoped<IPartRepository, PartRepository>();
 builder.Services.AddScoped<IPartService, PartService>();
 
+// програмный поиск сертификата для запуска службы через docker
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ConfigureHttpsDefaults(https =>
+    {
+        https.ServerCertificateSelector = (_, __) =>
+        {
+            using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadOnly);
+            return store.Certificates.Find(X509FindType.FindBySubjectName, "localhost", true).OfType<X509Certificate2>().First();
+        };
+    });
+});
 var app = builder.Build();
 
 app.UseCatalogApiForwardedHeaders();

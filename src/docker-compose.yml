@@ -1,0 +1,58 @@
+name: aspotus-project
+services:
+
+  catalog-api:
+    image: ${DOCKER_REGISTRY-}catalog-api
+    build:
+      context: .
+      dockerfile: Aspotus.Catalog.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5299
+    ports:
+      - "5299:5299" # только http
+#    volumes:
+#      - catalog.db:/app/catalog.db
+    networks:
+      - backend
+
+  orders-api:
+    image: ${DOCKER_REGISTRY-}orders-api
+    build:
+      context: .
+      dockerfile: Aspotus.Orders.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5115
+    ports:
+      - "5115:5115" # только http
+    volumes:
+      - orders.db:/app/orders.db
+    networks:
+      - backend
+
+  gateway:
+    image: ${DOCKER_REGISTRY-}gateway
+    build:
+      context: .
+      dockerfile: Aspotus.Gateway/Dockerfile
+    depends_on:
+      - catalog-api
+      - orders-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5230
+    ports:
+      - "5230:5230" # только http
+#    volumes:
+#      - gateway.db:/app/gateway.db
+    networks:
+      - backend
+
+volumes:
+  catalog.db:
+  orders.db:
+  gateway.db:
+
+networks:
+  backend:
