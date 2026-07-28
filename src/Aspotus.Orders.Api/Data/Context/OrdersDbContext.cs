@@ -34,6 +34,11 @@ public class OrdersDbContext : DbContext
     public DbSet<CarOrderItem> CarOrderItems => Set<CarOrderItem>();
 
     /// <summary>
+    /// Сообщения transactional outbox.
+    /// </summary>
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+
+    /// <summary>
     /// Настраивает модель базы данных и применяет конфигурации сущностей из сборки.
     /// </summary>
     /// <param name="modelBuilder">Построитель модели.</param>

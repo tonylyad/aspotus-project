@@ -26,7 +26,10 @@ public interface IOrderRepository
     /// <summary>
     /// Добавляет новый заказ.
     /// </summary>
-    Task AddAsync(Order order, CancellationToken cancellationToken = default);
+    Task AddAsync(
+        Order order,
+        OutboxMessage outboxMessage,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Обновляет существующий заказ.

@@ -11,6 +11,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Aspotus.Orders.Api/Aspotus.Orders.Api.csproj", "Aspotus.Orders.Api/"]
+COPY ["Aspotus.Shared/Aspotus.Shared.csproj", "Aspotus.Shared/"]
 RUN dotnet restore "./Aspotus.Orders.Api/Aspotus.Orders.Api.csproj"
 COPY . .
 WORKDIR "/src/Aspotus.Orders.Api"

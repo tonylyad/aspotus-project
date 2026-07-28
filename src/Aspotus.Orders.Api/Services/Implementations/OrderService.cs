@@ -6,6 +6,9 @@ using Aspotus.Orders.Api.Mappers;
 using Aspotus.Orders.Api.Models.Requests;
 using Aspotus.Orders.Api.Models.Responses;
 using Aspotus.Orders.Api.Services.Interfaces;
+using Aspotus.Shared.IntegrationEvents;
+using Aspotus.Shared.Messaging;
+using System.Text.Json;
 
 namespace Aspotus.Orders.Api.Services.Implementations;
 
@@ -97,7 +100,10 @@ public class OrderService : IOrderService
 
         order.TotalAmount = order.PartItems.Sum(x => x.TotalPrice);
 
-        await _orderRepository.AddAsync(order, cancellationToken);
+        await _orderRepository.AddAsync(
+            order,
+            CreateOutboxMessage(order),
+            cancellationToken);
 
         return OrderMapper.ToResponse(order);
     }
@@ -145,7 +151,10 @@ public class OrderService : IOrderService
 
         order.TotalAmount = order.CarItems.Sum(x => x.Price);
 
-        await _orderRepository.AddAsync(order, cancellationToken);
+        await _orderRepository.AddAsync(
+            order,
+            CreateOutboxMessage(order),
+            cancellationToken);
 
         return OrderMapper.ToResponse(order);
     }
@@ -180,5 +189,27 @@ public class OrderService : IOrderService
         return Guid.TryParse(userId, out var parsedUserId)
             ? parsedUserId
             : null;
+    }
+
+    private static OutboxMessage CreateOutboxMessage(Order order)
+    {
+        var integrationEvent = new OrderCreatedEvent(
+            EventId: Guid.NewGuid(),
+            OrderId: order.Id,
+            UserId: order.UserId,
+            UserEmail: order.UserEmail,
+            CustomerEmail: order.CustomerEmail,
+            CustomerName: order.CustomerName,
+            OrderType: order.OrderType.ToString(),
+            TotalAmount: order.TotalAmount,
+            CreatedAtUtc: order.CreatedAtUtc);
+
+        return new OutboxMessage
+        {
+            Id = integrationEvent.EventId,
+            Type = RabbitMqTopology.OrderCreatedRoutingKey,
+            Payload = JsonSerializer.Serialize(integrationEvent),
+            OccurredAtUtc = integrationEvent.CreatedAtUtc
+        };
     }
 }

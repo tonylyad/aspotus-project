@@ -11,8 +11,9 @@
 ## Состав solution
 
 - `Aspotus.Catalog.Api` — каталог
-- `Aspotus.Orders.Api` — заказы
-- `Aspotus.Gateway` — gateway, Identity, JWT, роли, Swagger
+- `Aspotus.Orders.Api` - заказы
+- `Aspotus.Notifications.Worker` - обработка асинхронных уведомлений
+- `Aspotus.Gateway` - gateway, Identity, JWT, роли, Swagger
 - `Aspotus.Shared` — общие сущности/контракты, если используются
 
 ## Технологии
@@ -22,6 +23,7 @@
 - EF Core
 - SQLite
 - Redis
+- RabbitMQ
 - Swagger
 - XML-аннотации для Swagger
 - YARP Reverse Proxy
@@ -45,9 +47,9 @@
 docker compose -f src/docker-compose.yml up --build -d
 ```
 
-При первом запуске Docker соберёт образы и запустит четыре контейнера: Gateway,
-Catalog API, Orders API и Redis. Миграции EF Core применяются автоматически при
-старте сервисов.
+При первом запуске Docker соберёт образы и запустит шесть контейнеров: Gateway,
+Catalog API, Orders API, Notifications Worker, Redis и RabbitMQ. Миграции EF Core
+применяются автоматически при старте сервисов.
 
 Проверить состояние контейнеров:
 
@@ -61,6 +63,12 @@ docker compose -f src/docker-compose.yml ps
 - Catalog API: <http://localhost:5299/swagger>
 - Orders API: <http://localhost:5115/swagger>
 - Redis: `localhost:6379`
+- RabbitMQ Management: <http://localhost:15672>
+
+Данные для входа в RabbitMQ Management в локальном окружении:
+
+- логин: `aspotus`
+- пароль: `aspotus-dev`
 
 Внешние запросы к API рекомендуется отправлять через Gateway:
 
@@ -72,6 +80,7 @@ SQLite-базы хранятся на компьютере вне контейн
 - `src/data/catalog/catalog.db`
 - `src/data/gateway/gateway.db`
 - `src/data/orders/orders.db`
+- `src/data/notifications/notifications.db`
 
 Поэтому данные сохраняются после остановки и пересоздания контейнеров.
 
@@ -103,6 +112,23 @@ Catalog API использует Redis как распределённый кэ�
 
 При создании, изменении или удалении марки соответствующие ключи удаляются из
 Redis. Если Redis временно недоступен, Catalog API продолжает работать с SQLite.
+
+## Асинхронные уведомления
+
+При создании заказа Orders API сохраняет заказ и событие `OrderCreated` в таблицу
+`OutboxMessages` одной транзакцией. Фоновый publisher отправляет событие в RabbitMQ
+через exchange `aspotus.events` с routing key `orders.created.v1`.
+
+Notifications Worker получает события из durable-очереди
+`notifications.order-created`, логирует уведомление и сохраняет идентификатор
+обработанного события в `notifications.db`. Inbox предотвращает повторную обработку
+события при повторной доставке RabbitMQ.
+
+Текущий поток:
+
+```text
+Gateway -> Orders API -> Orders DB / Outbox -> RabbitMQ -> Notifications Worker
+```
 
 ## Миграции
 dotnet ef database update --project Aspotus.Catalog.Api --startup-project Aspotus.Catalog.Api

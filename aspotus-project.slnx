@@ -10,6 +10,7 @@
     <File Path="src/README.md" />
     <Project Path="src/Aspotus.Catalog.Api/Aspotus.Catalog.Api.csproj" />
     <Project Path="src/Aspotus.Gateway/Aspotus.Gateway.csproj" />
+    <Project Path="src/Aspotus.Notifications.Worker/Aspotus.Notifications.Worker.csproj" />
     <Project Path="src/Aspotus.Orders.Api/Aspotus.Orders.Api.csproj" />
     <Project Path="src/Aspotus.Shared/Aspotus.Shared.csproj" />
   </Folder>

@@ -2,6 +2,8 @@ using Aspotus.Orders.Api.Data.Context;
 using Aspotus.Orders.Api.Data.Repositories.Implementations;
 using Aspotus.Orders.Api.Data.Repositories.Interfaces;
 using Aspotus.Orders.Api.Extensions;
+using Aspotus.Orders.Api.Messaging;
+using Aspotus.Orders.Api.Options;
 using Aspotus.Orders.Api.Services.Implementations;
 using Aspotus.Orders.Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +19,10 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddDbContext<OrdersDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("OrdersDb")));
+
+builder.Services.Configure<RabbitMqOptions>(
+    builder.Configuration.GetSection(RabbitMqOptions.SectionName));
+builder.Services.AddHostedService<OutboxPublisher>();
 
 // програмный поиск сертификата для запуска службы через docker
 builder.WebHost.ConfigureKestrel(options =>

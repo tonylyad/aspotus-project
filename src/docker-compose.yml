@@ -13,6 +13,24 @@ services:
     networks:
       - backend
 
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: aspotus
+      RABBITMQ_DEFAULT_PASS: aspotus-dev
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - backend
+
   catalog-api:
     image: ${DOCKER_REGISTRY-}catalog-api
     build:
@@ -42,10 +60,31 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:5115
       ConnectionStrings__OrdersDb: Data Source=/data/orders.db
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__Port: 5672
+      RabbitMq__UserName: aspotus
+      RabbitMq__Password: aspotus-dev
     ports:
       - "5115:5115"
     volumes:
       - ./data/orders:/data
+    networks:
+      - backend
+
+  notifications-worker:
+    image: ${DOCKER_REGISTRY-}notifications-worker
+    build:
+      context: .
+      dockerfile: Aspotus.Notifications.Worker/Dockerfile
+    environment:
+      DOTNET_ENVIRONMENT: Development
+      ConnectionStrings__NotificationsDb: Data Source=/data/notifications.db
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__Port: 5672
+      RabbitMq__UserName: aspotus
+      RabbitMq__Password: aspotus-dev
+    volumes:
+      - ./data/notifications:/data
     networks:
       - backend
 
@@ -72,3 +111,6 @@ services:
 
 networks:
   backend:
+
+volumes:
+  rabbitmq-data:
