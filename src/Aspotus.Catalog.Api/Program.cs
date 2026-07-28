@@ -3,6 +3,7 @@ using Aspotus.Catalog.Api.Data.Repositories.Implementations;
 using Aspotus.Catalog.Api.Data.Repositories.Interfaces;
 using Aspotus.Catalog.Api.Data.Seed;
 using Aspotus.Catalog.Api.Extensions;
+using Aspotus.Catalog.Api.Options;
 using Aspotus.Catalog.Api.Services.Implementations;
 using Aspotus.Catalog.Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,15 @@ builder.Services.AddCatalogApiSwagger();
 
 builder.Services.AddDbContext<CatalogDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("CatalogDb")));
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "aspotus:";
+});
+
+builder.Services.Configure<BrandCacheOptions>(
+    builder.Configuration.GetSection(BrandCacheOptions.SectionName));
 
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<IBrandService, BrandService>();

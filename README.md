@@ -21,6 +21,7 @@
 - ASP.NET Core Web API
 - EF Core
 - SQLite
+- Redis
 - Swagger
 - XML-аннотации для Swagger
 - YARP Reverse Proxy
@@ -44,8 +45,9 @@
 docker compose -f src/docker-compose.yml up --build -d
 ```
 
-При первом запуске Docker соберёт образы и запустит три контейнера. Миграции
-EF Core применяются автоматически при старте сервисов.
+При первом запуске Docker соберёт образы и запустит четыре контейнера: Gateway,
+Catalog API, Orders API и Redis. Миграции EF Core применяются автоматически при
+старте сервисов.
 
 Проверить состояние контейнеров:
 
@@ -58,6 +60,7 @@ docker compose -f src/docker-compose.yml ps
 - Gateway и общий Swagger: <http://localhost:5230/swagger>
 - Catalog API: <http://localhost:5299/swagger>
 - Orders API: <http://localhost:5115/swagger>
+- Redis: `localhost:6379`
 
 Внешние запросы к API рекомендуется отправлять через Gateway:
 
@@ -91,6 +94,15 @@ docker compose -f src/docker-compose.yml down
 ```
 
 Команда `down` не удаляет SQLite-файлы из `src/data`.
+
+## Кэширование
+
+Catalog API использует Redis как распределённый кэш для списка марок и отдельных
+марок автомобилей. Время хранения по умолчанию — 10 минут, его можно изменить
+параметром `Cache:BrandsExpirationMinutes`.
+
+При создании, изменении или удалении марки соответствующие ключи удаляются из
+Redis. Если Redis временно недоступен, Catalog API продолжает работать с SQLite.
 
 ## Миграции
 dotnet ef database update --project Aspotus.Catalog.Api --startup-project Aspotus.Catalog.Api

@@ -1,6 +1,18 @@
 name: aspotus-project
 
 services:
+  redis:
+    image: redis:7.2.14-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - backend
+
   catalog-api:
     image: ${DOCKER_REGISTRY-}catalog-api
     build:
@@ -10,6 +22,10 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:5299
       ConnectionStrings__CatalogDb: Data Source=/data/catalog.db
+      ConnectionStrings__Redis: redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
     ports:
       - "5299:5299"
     volumes:
