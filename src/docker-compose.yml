@@ -1,18 +1,19 @@
 name: aspotus-project
-services:
 
+services:
   catalog-api:
     image: ${DOCKER_REGISTRY-}catalog-api
     build:
       context: .
       dockerfile: Aspotus.Catalog.Api/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5299
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5299
+      ConnectionStrings__CatalogDb: Data Source=/data/catalog.db
     ports:
-      - "5299:5299" # только http
-#    volumes:
-#      - catalog.db:/app/catalog.db
+      - "5299:5299"
+    volumes:
+      - ./data/catalog:/data
     networks:
       - backend
 
@@ -22,12 +23,13 @@ services:
       context: .
       dockerfile: Aspotus.Orders.Api/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5115
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5115
+      ConnectionStrings__OrdersDb: Data Source=/data/orders.db
     ports:
-      - "5115:5115" # только http
+      - "5115:5115"
     volumes:
-      - orders.db:/app/orders.db
+      - ./data/orders:/data
     networks:
       - backend
 
@@ -40,19 +42,17 @@ services:
       - catalog-api
       - orders-api
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5230
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5230
+      ConnectionStrings__DefaultConnection: Data Source=/data/gateway.db
+      ReverseProxy__Clusters__catalog-cluster__Destinations__catalog-destination__Address: http://catalog-api:5299/
+      ReverseProxy__Clusters__orders-cluster__Destinations__orders-destination__Address: http://orders-api:5115/
     ports:
-      - "5230:5230" # только http
-#    volumes:
-#      - gateway.db:/app/gateway.db
+      - "5230:5230"
+    volumes:
+      - ./data/gateway:/data
     networks:
       - backend
-
-volumes:
-  catalog.db:
-  orders.db:
-  gateway.db:
 
 networks:
   backend:
