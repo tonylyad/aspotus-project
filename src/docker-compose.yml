@@ -73,6 +73,19 @@ services:
     networks:
       - backend
 
+  files-api:
+    image: ${DOCKER_REGISTRY-}files-api
+    build:
+      context: .
+      dockerfile: Aspotus.Filestore.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5133
+    ports:
+      - "5133:5133"
+    networks:
+      - backend
+
   notifications-worker:
     image: ${DOCKER_REGISTRY-}notifications-worker
     build:
@@ -107,6 +120,7 @@ services:
       ConnectionStrings__DefaultConnection: Data Source=/data/gateway.db
       ReverseProxy__Clusters__catalog-cluster__Destinations__catalog-destination__Address: http://catalog-api:5299/
       ReverseProxy__Clusters__orders-cluster__Destinations__orders-destination__Address: http://orders-api:5115/
+      ReverseProxy__Clusters__files-cluster__Destinations__files-destination__Address: http://orders-api:5133/
     ports:
       - "5230:5230"
     volumes:

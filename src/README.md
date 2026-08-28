@@ -6,3 +6,4 @@
 - Aspotus.Orders.Api - сервис заказов
 - Aspotus.Notifications.Worker - обработчик асинхронных уведомлений
 - Aspotus.Shared - общие DTO, enum, константы и исключения
+- Aspotus.Filestore.Api - внешнее хранилище файлов
