@@ -1,6 +1,4 @@
-﻿using Amazon.Runtime;
-using Microsoft.Extensions.Options;
-using System.Text;
+﻿using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace Aspotus.Filestore.Api.Services
@@ -26,11 +24,8 @@ namespace Aspotus.Filestore.Api.Services
             {
                 using (HttpClient httpClient = new HttpClient())
                 {
-                    // хранить токен в настройках не получается, GitHub не дает сделать push
-                    string codedToken = "=cGRL5WQ3cFcIRzatJ3ctZ2VxAzM24kbwE0aSNWbnVjcIJ0U4h3SMdWWmRWWu1ES0RXSNpVeGtWRwpUMyNEcmJ3UmZmaaV3MSFzX0cUL1EUaVJXY3J2au4UcalmTxpkaTZHcsJVc1oWUHR3alFmWwMWY0YTMPp1aNpHcsl1TKx2T5VjePNTNqpkc0oWYXBnbyNjc6JWewhnVyA3aLZnWux0NNxWVhVjeaFnWsVWdlhHOfVneilHc4ZlMwt2S2plbMdTTsVVY1onWxpFblVXZ542M402VHBXbQNkWtQHV10WTL5kbX9kWutULZBDW19WalNkWwMWYJdTMMVWM5IXaaFFOycTN2N0TGFzd5o3Mk9VcZdUR2lTZtI3cqZkTk9FOsNTWrpkZzxGW51kbNlXWs9kb0kXVyAXehdFcuJ3Ml5mSxhDeOZXWpNWLv5GZyQTaKhkWu5UcaxWZ1VWOuEDd";
-                    string base64 = new string(codedToken.Reverse().ToArray());
-                    byte[] bytes = Convert.FromBase64String(base64);
-                    string iamToken = Encoding.Default.GetString(bytes);
+                    YandexIamClient yandexIamClient = new YandexIamClient();
+                    string iamToken = await yandexIamClient.GetIamToken();
                     httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {iamToken}");
                     _accountToInit.PublicId = await GetSecretValueAsync(httpClient, _settings.CredentialPublic, token);
                     _accountToInit.PrivateId = await GetSecretValueAsync(httpClient, _settings.CredentialPrivate, token);
