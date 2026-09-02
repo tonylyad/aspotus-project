@@ -1,0 +1,6 @@
+@Aspotus.Filestore.Api_HostAddress = http://localhost:5133
+
+GET {{Aspotus.Filestore.Api_HostAddress}}/files/
+Accept: application/json
+
+###
