@@ -1,16 +1,19 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
 import { getUserRoles } from './utils/auth.js'
-import Dashboard from './pages/Dashboard.jsx'
-import Login from './pages/Login.jsx'
-import Generations from './pages/Generations.jsx'
-import Cars from './pages/Cars.jsx'
-import Categories from './pages/Categories.jsx'
-import Manufacturers from './pages/Manufacturers.jsx'
-import Users from './pages/Users.jsx'
-import Parts from './pages/Parts.jsx'
-import Brands from './pages/Brands.jsx'
-import Orders from './pages/Orders.jsx'
+
+const Dashboard = lazy(() => import('./pages/Dashboard.jsx'))
+const Login = lazy(() => import('./pages/Login.jsx'))
+const Generations = lazy(() => import('./pages/Generations.jsx'))
+const Cars = lazy(() => import('./pages/Cars.jsx'))
+const Categories = lazy(() => import('./pages/Categories.jsx'))
+const Manufacturers = lazy(() => import('./pages/Manufacturers.jsx'))
+const Users = lazy(() => import('./pages/Users.jsx'))
+const Parts = lazy(() => import('./pages/Parts.jsx'))
+const Brands = lazy(() => import('./pages/Brands.jsx'))
+const Orders = lazy(() => import('./pages/Orders.jsx'))
+const Requests = lazy(() => import('./pages/Requests.jsx'))
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token')
@@ -29,7 +32,7 @@ function RoleRoute({ roles, children }) {
 
 export default function App() {
   return (
-    <Routes>
+    <Suspense fallback={<div style={{ padding: 32 }}>Загрузка…</div>}><Routes>
       <Route path="/login" element={<Login />} />
       <Route
         element={
@@ -47,8 +50,9 @@ export default function App() {
         <Route path="/manufacturers" element={<RoleRoute roles={['Admin', 'ContentModerator']}><Manufacturers /></RoleRoute>} />
         <Route path="/parts" element={<RoleRoute roles={['Admin', 'ContentModerator']}><Parts /></RoleRoute>} />
         <Route path="/orders" element={<RoleRoute roles={['Admin', 'Operator']}><Orders /></RoleRoute>} />
+        <Route path="/requests" element={<RoleRoute roles={['Admin', 'Operator']}><Requests /></RoleRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    </Routes></Suspense>
   )
 }

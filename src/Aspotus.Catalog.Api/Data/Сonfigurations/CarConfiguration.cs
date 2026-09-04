@@ -52,6 +52,9 @@ public class CarConfiguration : IEntityTypeConfiguration<Car>
         builder.Property(x => x.Mileage)
             .IsRequired();
 
+        builder.Property(x => x.Price)
+            .HasPrecision(18, 2);
+
         builder.Property(x => x.TrimLevelName)
             .HasMaxLength(100);
 

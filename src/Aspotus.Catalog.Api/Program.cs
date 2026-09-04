@@ -46,6 +46,7 @@ builder.Services.AddScoped<IPartManufacturerService, PartManufacturerService>();
 
 builder.Services.AddScoped<IPartRepository, PartRepository>();
 builder.Services.AddScoped<IPartService, PartService>();
+builder.Services.AddScoped<IInventoryReservationService, InventoryReservationService>();
 
 // програмный поиск сертификата для запуска службы через docker
 builder.WebHost.ConfigureKestrel(options =>

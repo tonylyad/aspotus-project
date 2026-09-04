@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Box, Button, IconButton, Typography } from '@mui/material'
-import { AddPhotoAlternate, Delete, DragIndicator, Star, StarBorder } from '@mui/icons-material'
+import { AddPhotoAlternate, Delete, DragIndicator } from '@mui/icons-material'
 
 const MAX_IMAGES = 5
 
@@ -62,8 +62,6 @@ export default function CatalogImagesEditor({ items, setItems, onRemoveStored })
     setDraggingIndex(null)
     setDropPosition(null)
   }
-
-  const makePrimary = (index) => moveImage(index, 0)
 
   const removeImage = (image) => {
     if (image.pending) URL.revokeObjectURL(image.preview)
@@ -135,9 +133,6 @@ export default function CatalogImagesEditor({ items, setItems, onRemoveStored })
             <DragIndicator className="catalog-image__drag" />
             <span className="catalog-image__number">{index + 1}</span>
             <Box className="catalog-image__actions">
-              <IconButton size="small" title="Сделать главной" onClick={() => makePrimary(index)}>
-                {index === 0 ? <Star color="warning" /> : <StarBorder />}
-              </IconButton>
               <IconButton size="small" color="error" title="Удалить" onClick={() => removeImage(image)}>
                 <Delete />
               </IconButton>

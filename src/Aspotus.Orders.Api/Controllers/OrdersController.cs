@@ -76,7 +76,7 @@ public class OrdersController : ControllerBase
 
     /// <summary>
     /// Возвращает заказ по идентификатору.
-    /// Доступно только оператору и администратору.
+    /// Покупатель может смотреть только собственный заказ.
     /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -84,17 +84,27 @@ public class OrdersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
-        if (!HttpContext.HasGatewayRole("Operator") &&
-            !HttpContext.HasGatewayRole("Admin"))
-        {
-            return StatusCode(StatusCodes.Status403Forbidden);
-        }
-
         var result = await _orderService.GetByIdAsync(id, cancellationToken);
 
         if (result is null)
         {
             return NotFound();
+        }
+
+        var isOperator = HttpContext.HasGatewayRole("Operator");
+        var isAdmin = HttpContext.HasGatewayRole("Admin");
+
+        if (!isOperator && !isAdmin)
+        {
+            var isCustomer = HttpContext.HasGatewayRole("Customer");
+            var currentUserId = HttpContext.GetGatewayUserId();
+
+            if (!isCustomer ||
+                !Guid.TryParse(currentUserId, out var parsedCurrentUserId) ||
+                result.UserId != parsedCurrentUserId)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden);
+            }
         }
 
         return Ok(result);
@@ -156,6 +166,26 @@ public class OrdersController : ControllerBase
             cancellationToken);
 
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+    }
+
+    /// <summary>
+    /// Изменяет статус заказа. Доступно оператору и администратору.
+    /// </summary>
+    [HttpPatch("{id:guid}/status")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateStatus(
+        Guid id,
+        UpdateOrderStatusRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (!HttpContext.HasGatewayRole("Operator") && !HttpContext.HasGatewayRole("Admin"))
+            return StatusCode(StatusCodes.Status403Forbidden);
+
+        var result = await _orderService.UpdateStatusAsync(id, request, cancellationToken);
+        return result is null ? NotFound() : Ok(result);
     }
 
     /// <summary>

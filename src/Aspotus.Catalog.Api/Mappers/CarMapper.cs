@@ -26,6 +26,7 @@ public static class CarMapper
             GenerationName = entity.Generation.Name,
             Year = entity.Year,
             Mileage = entity.Mileage,
+            Price = entity.Price,
             BodyType = entity.BodyType,
             TrimLevelName = entity.TrimLevelName,
             TrimLevelDescription = entity.TrimLevelDescription,

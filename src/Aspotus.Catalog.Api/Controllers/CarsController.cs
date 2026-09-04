@@ -1,112 +1,93 @@
-﻿using Aspotus.Catalog.Api.Models.Requests;
+using Aspotus.Catalog.Api.Models.Requests;
+using Aspotus.Catalog.Api.Models.Responses;
 using Aspotus.Catalog.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aspotus.Catalog.Api.Controllers;
 
-/// <summary>
-/// Предоставляет endpoint'ы для работы с автомобилями.
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class CarsController : ControllerBase
 {
     private readonly ICarService _carService;
+    private readonly IInventoryReservationService? _reservationService;
 
-    /// <summary>
-    /// Инициализирует новый экземпляр контроллера автомобилей.
-    /// </summary>
-    public CarsController(ICarService carService)
+    public CarsController(ICarService carService, IInventoryReservationService? reservationService = null)
     {
         _carService = carService;
+        _reservationService = reservationService;
     }
 
-    /// <summary>
-    /// Возвращает список автомобилей.
-    /// </summary>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var result = await _carService.GetAllAsync(cancellationToken);
+        await ApplyAvailabilityAsync(result, cancellationToken);
         return Ok(result);
     }
 
-    /// <summary>
-    /// Возвращает автомобиль по идентификатору.
-    /// </summary>
-    /// <param name="id">Идентификатор автомобиля.</param>
+    [HttpGet("paged")]
+    public async Task<IActionResult> GetPaged(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 9,
+        [FromQuery] string? query = null,
+        CancellationToken cancellationToken = default)
+    {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+        var items = (await _carService.GetAllAsync(cancellationToken)).ToList();
+        await ApplyAvailabilityAsync(items, cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            var terms = query.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            items = items.Where(car => terms.All(term =>
+                $"{car.BrandName} {car.ModelName} {car.GenerationName} {car.BodyType} {car.FuelType} {car.TransmissionType} {car.DriveType} {car.Year}"
+                    .Contains(term, StringComparison.OrdinalIgnoreCase))).ToList();
+        }
+
+        return Ok(new PagedResponse<CarResponse>
+        {
+            Items = items.Skip((page - 1) * pageSize).Take(pageSize).ToList(),
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = items.Count
+        });
+    }
+
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _carService.GetByIdAsync(id, cancellationToken);
-
-        if (result is null)
-        {
-            return NotFound();
-        }
-
+        if (result is null) return NotFound();
+        await ApplyAvailabilityAsync(new[] { result }, cancellationToken);
         return Ok(result);
     }
 
-    /// <summary>
-    /// Создаёт новый автомобиль.
-    /// </summary>
-    /// <param name="request">Данные нового автомобиля.</param>
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create(
-        [FromBody] CreateCarRequest request,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(CreateCarRequest request, CancellationToken cancellationToken)
     {
         var result = await _carService.CreateAsync(request, cancellationToken);
-
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
-    /// <summary>
-    /// Обновляет существующий автомобиль.
-    /// </summary>
-    /// <param name="id">Идентификатор автомобиля.</param>
-    /// <param name="request">Новые данные автомобиля.</param>
     [HttpPut("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(
-        Guid id,
-        [FromBody] UpdateCarRequest request,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(Guid id, UpdateCarRequest request, CancellationToken cancellationToken)
     {
         var result = await _carService.UpdateAsync(id, request, cancellationToken);
-
-        if (result is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(result);
+        return result is null ? NotFound() : Ok(result);
     }
 
-    /// <summary>
-    /// Удаляет автомобиль по идентификатору.
-    /// </summary>
-    /// <param name="id">Идентификатор автомобиля.</param>
     [HttpDelete("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        var deleted = await _carService.DeleteAsync(id, cancellationToken);
+        return await _carService.DeleteAsync(id, cancellationToken) ? NoContent() : NotFound();
+    }
 
-        if (!deleted)
-        {
-            return NotFound();
-        }
-
-        return NoContent();
+    private async Task ApplyAvailabilityAsync(IEnumerable<CarResponse> cars, CancellationToken cancellationToken)
+    {
+        if (_reservationService is null) return;
+        var reservedIds = await _reservationService.GetReservedCarIdsAsync(cancellationToken);
+        foreach (var car in cars) car.IsAvailable = !reservedIds.Contains(car.Id);
     }
 }

@@ -38,6 +38,8 @@ public class OrdersDbContext : DbContext
     /// </summary>
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
+    public DbSet<CustomerRequest> CustomerRequests => Set<CustomerRequest>();
+
     /// <summary>
     /// Настраивает модель базы данных и применяет конфигурации сущностей из сборки.
     /// </summary>

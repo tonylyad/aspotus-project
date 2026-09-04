@@ -15,7 +15,7 @@ namespace Aspotus.Catalog.Api.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.5");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.11");
 
             modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.Car", b =>
                 {
@@ -52,6 +52,10 @@ namespace Aspotus.Catalog.Api.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid>("ModelId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TransmissionType")
@@ -178,6 +182,80 @@ namespace Aspotus.Catalog.Api.Migrations
                     b.HasIndex("BrandId");
 
                     b.ToTable("CarModels", (string)null);
+                });
+
+            modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.InventoryReservation", b =>
+                {
+                    b.Property<Guid>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("OrderId");
+
+                    b.ToTable("InventoryReservations", (string)null);
+                });
+
+            modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.InventoryReservationItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Article")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BrandName")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GenerationName")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ModelName")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("Year")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductType", "ProductId");
+
+                    b.ToTable("InventoryReservationItems", (string)null);
                 });
 
             modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.Part", b =>
@@ -406,6 +484,17 @@ namespace Aspotus.Catalog.Api.Migrations
                     b.Navigation("Brand");
                 });
 
+            modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.InventoryReservationItem", b =>
+                {
+                    b.HasOne("Aspotus.Catalog.Api.Data.Entities.InventoryReservation", "Reservation")
+                        .WithMany("Items")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reservation");
+                });
+
             modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.Part", b =>
                 {
                     b.HasOne("Aspotus.Catalog.Api.Data.Entities.PartCategory", "Category")
@@ -496,6 +585,11 @@ namespace Aspotus.Catalog.Api.Migrations
             modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.CarModel", b =>
                 {
                     b.Navigation("Generations");
+                });
+
+            modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.InventoryReservation", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.Part", b =>

@@ -54,6 +54,14 @@ public interface IOrderService
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Изменяет статус заказа. При отмене освобождает резерв в каталоге.
+    /// </summary>
+    Task<OrderResponse?> UpdateStatusAsync(
+        Guid id,
+        UpdateOrderStatusRequest request,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Удаляет заказ по идентификатору.
     /// </summary>
     Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);

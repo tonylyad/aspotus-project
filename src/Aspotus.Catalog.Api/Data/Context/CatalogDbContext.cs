@@ -20,6 +20,8 @@ namespace Aspotus.Catalog.Api.Data.Context
         public DbSet<PartManufacturer> PartManufacturers => Set<PartManufacturer>();
         public DbSet<Part> Parts => Set<Part>();
         public DbSet<PartImage> PartImages => Set<PartImage>();
+        public DbSet<InventoryReservation> InventoryReservations => Set<InventoryReservation>();
+        public DbSet<InventoryReservationItem> InventoryReservationItems => Set<InventoryReservationItem>();
 
         public DbSet<PartCompatibility> PartCompatibilities => Set<PartCompatibility>();
 

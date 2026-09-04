@@ -53,6 +53,11 @@ public class Car
     public int Mileage { get; set; }
 
     /// <summary>
+    /// Цена автомобиля.
+    /// </summary>
+    public decimal Price { get; set; }
+
+    /// <summary>
     /// Тип кузова автомобиля.
     /// Например: Sedan, Suv, Hatchback.
     /// </summary>

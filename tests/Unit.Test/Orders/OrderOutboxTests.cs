@@ -1,4 +1,5 @@
 using Aspotus.Orders.Api.Data.Entities;
+using Aspotus.Orders.Api.Clients;
 using Aspotus.Orders.Api.Data.Repositories.Interfaces;
 using Aspotus.Orders.Api.Models.Requests;
 using Aspotus.Orders.Api.Services.Implementations;
@@ -32,7 +33,29 @@ public sealed class OrderOutboxTests
             })
             .Returns(Task.CompletedTask);
 
-        var service = new OrderService(repository.Object);
+        var catalogClient = new Mock<ICatalogInventoryClient>();
+        catalogClient
+            .Setup(x => x.ReserveAsync(
+                It.IsAny<Guid>(),
+                It.IsAny<Guid?>(),
+                It.IsAny<IReadOnlyCollection<CatalogReservationItemRequest>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Guid orderId, Guid? _, IReadOnlyCollection<CatalogReservationItemRequest> items, CancellationToken _) =>
+                new CatalogReservationResponse
+                {
+                    OrderId = orderId,
+                    Items = items.Select(item => new CatalogReservationItemResponse
+                    {
+                        ProductType = "Part",
+                        ProductId = item.ProductId,
+                        Quantity = item.Quantity,
+                        UnitPrice = 500,
+                        Name = "Test part",
+                        Article = "TEST-001"
+                    }).ToList()
+                });
+
+        var service = new OrderService(repository.Object, catalogClient.Object);
         var request = new CreatePartOrderRequest
         {
             CustomerName = " Test Customer ",

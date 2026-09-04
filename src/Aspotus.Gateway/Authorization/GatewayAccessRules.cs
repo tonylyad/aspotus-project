@@ -44,6 +44,19 @@ public static class GatewayAccessRules
             // Orders: создание заказа — только авторизованные покупатель / оператор / админ
             new()
             {
+                PathPrefix = "/orders/api/requests",
+                Methods = new[] { "POST" },
+                AllowAnonymous = true
+            },
+            new()
+            {
+                PathPrefix = "/orders/api/requests",
+                Methods = new[] { "GET", "PATCH" },
+                AllowedRoles = new[] { "Operator", "Admin" }
+            },
+
+            new()
+            {
                 PathPrefix = "/orders/api/orders/parts",
                 Methods = new[] { "POST" },
                 AllowedRoles = new[] { "Customer", "Operator", "Admin" }
@@ -55,11 +68,28 @@ public static class GatewayAccessRules
                 AllowedRoles = new[] { "Customer", "Operator", "Admin" }
             },
 
-            // Orders: просмотр любых заказов — только оператор и админ
+            // Orders: просмотр вложенных ресурсов заказа доступен покупателю;
+            // Orders API дополнительно проверяет принадлежность заказа пользователю.
+            new()
+            {
+                PathPrefix = "/orders/api/orders/",
+                Methods = new[] { "GET" },
+                AllowedRoles = new[] { "Customer", "Operator", "Admin" }
+            },
+
+            // Orders: просмотр общего списка заказов — только оператор и админ
             new()
             {
                 PathPrefix = "/orders/api/orders",
                 Methods = new[] { "GET" },
+                AllowedRoles = new[] { "Operator", "Admin" }
+            },
+
+            // Orders: изменение статуса — только оператор и админ
+            new()
+            {
+                PathPrefix = "/orders/api/orders",
+                Methods = new[] { "PATCH" },
                 AllowedRoles = new[] { "Operator", "Admin" }
             },
 

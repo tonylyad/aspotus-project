@@ -38,6 +38,13 @@ public class PartResponse
     public int StockQuantity { get; set; }
 
     /// <summary>
+    /// Количество, доступное для новых заказов с учётом резервов.
+    /// </summary>
+    public int AvailableStockQuantity { get; set; }
+
+    public bool IsAvailable => AvailableStockQuantity > 0;
+
+    /// <summary>
     /// Признак оригинальной запчасти.
     /// </summary>
     public bool IsOriginal { get; set; }

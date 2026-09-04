@@ -3,7 +3,7 @@ import {
   Box, Typography, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, IconButton, TextField,
   Dialog, DialogTitle, DialogContent, DialogActions, Button,
-  Alert, Snackbar, TablePagination, Chip,
+  Alert, Snackbar, TablePagination, Chip, FormControl, InputLabel, MenuItem, Select,
 } from '@mui/material'
 import { Visibility as ViewIcon } from '@mui/icons-material'
 
@@ -14,6 +14,18 @@ async function apiGet(url) {
   const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
   if (!res.ok) throw new Error('Ошибка загрузки')
   return res.json()
+}
+
+async function apiPatch(url, body) {
+  const token = localStorage.getItem('token')
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  const data = await res.json().catch(() => null)
+  if (!res.ok) throw new Error(data?.message || 'Не удалось изменить статус заказа')
+  return data
 }
 
 const statusColors = {
@@ -56,6 +68,23 @@ export default function Orders() {
   }, [])
 
   useEffect(() => { fetchOrders() }, [fetchOrders])
+
+  const updateStatus = async (status) => {
+    try {
+      const updated = await apiPatch(`${API}/orders/${detailOrder.id}/status`, { status })
+      setOrders((current) => current.map((order) => order.id === updated.id ? updated : order))
+      setDetailOrder(updated)
+      setSnackbar({ open: true, message: 'Статус заказа обновлён', severity: 'success' })
+    } catch (err) {
+      setSnackbar({ open: true, message: err.message, severity: 'error' })
+    }
+  }
+
+  const availableStatuses = detailOrder?.status === 'Created'
+    ? ['Created', 'Processing', 'Cancelled']
+    : detailOrder?.status === 'Processing'
+      ? ['Processing', 'Completed', 'Cancelled']
+      : [detailOrder?.status].filter(Boolean)
 
   function formatDate(utcStr) {
     if (!utcStr) return '—'
@@ -234,6 +263,14 @@ export default function Orders() {
           )}
         </DialogContent>
         <DialogActions>
+          {detailOrder && (
+            <FormControl size="small" sx={{ minWidth: 190, mr: 'auto' }}>
+              <InputLabel>Статус заказа</InputLabel>
+              <Select value={detailOrder.status} label="Статус заказа" onChange={(event) => updateStatus(event.target.value)}>
+                {availableStatuses.map((status) => <MenuItem key={status} value={status}>{statusLabels[status]}</MenuItem>)}
+              </Select>
+            </FormControl>
+          )}
           <Button onClick={() => setDetailOrder(null)}>Закрыть</Button>
         </DialogActions>
       </Dialog>

@@ -51,6 +51,16 @@ public class CarResponse
     public int Mileage { get; set; }
 
     /// <summary>
+    /// Цена автомобиля.
+    /// </summary>
+    public decimal Price { get; set; }
+
+    /// <summary>
+    /// Доступен ли автомобиль для нового заказа.
+    /// </summary>
+    public bool IsAvailable { get; set; } = true;
+
+    /// <summary>
     /// Тип кузова.
     /// </summary>
     public string BodyType { get; set; } = null!;

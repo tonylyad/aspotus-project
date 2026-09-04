@@ -41,6 +41,7 @@ services:
       ASPNETCORE_URLS: http://+:5299
       ConnectionStrings__CatalogDb: Data Source=/data/catalog.db
       ConnectionStrings__Redis: redis:6379
+      InternalApiKey: aspotus-internal-dev
     depends_on:
       redis:
         condition: service_healthy
@@ -58,6 +59,7 @@ services:
       dockerfile: Aspotus.Orders.Api/Dockerfile
     depends_on:
       - rabbitmq
+      - catalog-api
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:5115
@@ -66,6 +68,8 @@ services:
       RabbitMq__Port: 5672
       RabbitMq__UserName: aspotus
       RabbitMq__Password: aspotus-dev
+      Catalog__BaseUrl: http://catalog-api:5299/
+      Catalog__InternalApiKey: aspotus-internal-dev
     ports:
       - "5115:5115"
     volumes:
@@ -117,6 +121,20 @@ services:
       VITE_GATEWAY_URL: http://gateway:5230
     ports:
       - "5174:5174"
+    networks:
+      - backend
+
+  customer-web:
+    image: ${DOCKER_REGISTRY-}customer-web
+    build:
+      context: .
+      dockerfile: Aspotus.Customer.Web/Dockerfile
+    depends_on:
+      - gateway
+    environment:
+      VITE_GATEWAY_URL: http://gateway:5230
+    ports:
+      - "5173:5173"
     networks:
       - backend
 

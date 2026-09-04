@@ -1,136 +1,112 @@
 using Aspotus.Catalog.Api.Models.Requests;
+using Aspotus.Catalog.Api.Models.Responses;
 using Aspotus.Catalog.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aspotus.Catalog.Api.Controllers;
 
-/// <summary>
-/// Предоставляет endpoint'ы для работы с запчастями.
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class PartsController : ControllerBase
 {
     private readonly IPartService _partService;
+    private readonly IInventoryReservationService? _reservationService;
 
-    /// <summary>
-    /// Инициализирует новый экземпляр контроллера запчастей.
-    /// </summary>
-    public PartsController(IPartService partService)
+    public PartsController(IPartService partService, IInventoryReservationService? reservationService = null)
     {
         _partService = partService;
+        _reservationService = reservationService;
     }
 
-    /// <summary>
-    /// Возвращает список запчастей.
-    /// </summary>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var result = await _partService.GetAllAsync(cancellationToken);
+        await ApplyAvailabilityAsync(result, cancellationToken);
         return Ok(result);
     }
 
-    /// <summary>
-    /// Возвращает запчасть по идентификатору.
-    /// </summary>
-    /// <param name="id">Идентификатор запчасти.</param>
+    [HttpGet("paged")]
+    public async Task<IActionResult> GetPaged(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 9,
+        [FromQuery] string? query = null,
+        CancellationToken cancellationToken = default)
+    {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+        var items = (await _partService.GetAllAsync(cancellationToken)).ToList();
+        await ApplyAvailabilityAsync(items, cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            var terms = query.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            items = items.Where(part => terms.All(term =>
+                $"{part.Name} {part.Article} {part.CategoryName} {part.ManufacturerName} {part.Description} {string.Join(' ', part.ReplacementArticles)}"
+                    .Contains(term, StringComparison.OrdinalIgnoreCase))).ToList();
+        }
+
+        return Ok(new PagedResponse<PartResponse>
+        {
+            Items = items.Skip((page - 1) * pageSize).Take(pageSize).ToList(),
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = items.Count
+        });
+    }
+
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _partService.GetByIdAsync(id, cancellationToken);
-
-        if (result is null)
-        {
-            return NotFound();
-        }
-
+        if (result is null) return NotFound();
+        await ApplyAvailabilityAsync(new[] { result }, cancellationToken);
         return Ok(result);
     }
 
-    /// <summary>
-    /// Создаёт новую запчасть.
-    /// </summary>
-    /// <param name="request">Данные новой запчасти.</param>
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create([FromBody] CreatePartRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(CreatePartRequest request, CancellationToken cancellationToken)
     {
         var result = await _partService.CreateAsync(request, cancellationToken);
-
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
-    /// <summary>
-    /// Обновляет существующую запчасть.
-    /// </summary>
-    /// <param name="id">Идентификатор запчасти.</param>
-    /// <param name="request">Новые данные запчасти.</param>
     [HttpPut("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(
-        Guid id,
-        [FromBody] UpdatePartRequest request,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(Guid id, UpdatePartRequest request, CancellationToken cancellationToken)
     {
         var result = await _partService.UpdateAsync(id, request, cancellationToken);
-
-        if (result is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(result);
+        return result is null ? NotFound() : Ok(result);
     }
 
-    /// <summary>
-    /// Удаляет запчасть по идентификатору.
-    /// </summary>
-    /// <param name="id">Идентификатор запчасти.</param>
     [HttpDelete("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        var deleted = await _partService.DeleteAsync(id, cancellationToken);
-
-        if (!deleted)
-        {
-            return NotFound();
-        }
-
-        return NoContent();
+        return await _partService.DeleteAsync(id, cancellationToken) ? NoContent() : NotFound();
     }
 
-    /// <summary>
-    /// Возвращает список запчастей для указанной категории.
-    /// </summary>
-    /// <param name="categoryId">Идентификатор категории запчастей.</param>
     [HttpGet("by-category/{categoryId:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByCategoryId(Guid categoryId, CancellationToken cancellationToken)
     {
         var result = await _partService.GetByCategoryIdAsync(categoryId, cancellationToken);
+        await ApplyAvailabilityAsync(result, cancellationToken);
         return Ok(result);
     }
 
-    /// <summary>
-    /// Возвращает список запчастей, совместимых с указанным автомобилем.
-    /// </summary>
-    /// <param name="carId">Идентификатор автомобиля.</param>
     [HttpGet("by-car/{carId:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByCarId(Guid carId, CancellationToken cancellationToken)
     {
         var result = await _partService.GetByCarIdAsync(carId, cancellationToken);
+        await ApplyAvailabilityAsync(result, cancellationToken);
         return Ok(result);
+    }
+
+    private async Task ApplyAvailabilityAsync(IEnumerable<PartResponse> parts, CancellationToken cancellationToken)
+    {
+        if (_reservationService is null) return;
+        var reserved = await _reservationService.GetReservedPartQuantitiesAsync(cancellationToken);
+        foreach (var part in parts)
+        {
+            part.AvailableStockQuantity = Math.Max(0, part.StockQuantity - reserved.GetValueOrDefault(part.Id));
+        }
     }
 }

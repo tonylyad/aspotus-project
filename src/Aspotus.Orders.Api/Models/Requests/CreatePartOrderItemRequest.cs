@@ -16,19 +16,16 @@ public class CreatePartOrderItemRequest
     /// <summary>
     /// Название запчасти на момент оформления заказа.
     /// </summary>
-    [Required(ErrorMessage = "Название запчасти обязательно для заполнения.")]
-    public string PartName { get; set; } = null!;
+    public string? PartName { get; set; }
 
     /// <summary>
     /// Артикул запчасти на момент оформления заказа.
     /// </summary>
-    [Required(ErrorMessage = "Артикул запчасти обязателен для заполнения.")]
-    public string PartArticle { get; set; } = null!;
+    public string? PartArticle { get; set; }
 
     /// <summary>
     /// Цена одной единицы запчасти на момент оформления заказа.
     /// </summary>
-    [Range(0.01, 1000000000, ErrorMessage = "Цена запчасти должна быть больше 0.")]
     public decimal UnitPrice { get; set; }
 
     /// <summary>

@@ -1,0 +1,28 @@
+body {
+    background: #111;
+    color: white;
+    overflow-x: hidden;
+}
+
+.hero {
+    background: linear-gradient( 135deg, #111, #1f1f1f );
+}
+
+.card {
+    background: #1f1f1f;
+    color: white;
+    border-radius: 20px;
+    transition: .4s;
+}
+
+    .card:hover {
+        transform: translateY(-8px);
+    }
+
+.navbar {
+    backdrop-filter: blur(10px);
+}
+
+img {
+    border-radius: 20px;
+}

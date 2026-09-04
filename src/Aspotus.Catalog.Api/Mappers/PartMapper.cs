@@ -23,6 +23,7 @@ public static class PartMapper
             Description = entity.Description,
             Price = entity.Price,
             StockQuantity = entity.StockQuantity,
+            AvailableStockQuantity = entity.StockQuantity,
             IsOriginal = entity.IsOriginal,
             ConditionType = entity.ConditionType,
             ConditionPercent = entity.ConditionPercent,

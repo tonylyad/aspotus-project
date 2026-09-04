@@ -14,6 +14,8 @@
 - `Aspotus.Orders.Api` - заказы
 - `Aspotus.Notifications.Worker` - обработка асинхронных уведомлений
 - `Aspotus.Gateway` - gateway, Identity, JWT, роли, Swagger
+- `Aspotus.Admin.Web` — панель управления
+- `Aspotus.Customer.Web` — клиентский сайт
 - `Aspotus.Shared` — общие сущности/контракты, если используются
 
 ## Технологии
@@ -47,8 +49,8 @@
 docker compose -f src/docker-compose.yml up --build -d
 ```
 
-При первом запуске Docker соберёт образы и запустит шесть контейнеров: Gateway,
-Catalog API, Orders API, Notifications Worker, Redis и RabbitMQ. Миграции EF Core
+При первом запуске Docker соберёт образы и запустит API, оба фронтенда,
+Notifications Worker, Redis и RabbitMQ. Миграции EF Core
 применяются автоматически при старте сервисов.
 
 Проверить состояние контейнеров:
@@ -75,6 +77,7 @@ docker compose -f src/docker-compose.yml ps
 - Catalog: `http://localhost:5230/catalog/...`
 - Orders: `http://localhost:5230/orders/...`
 - Files: `http://localhost:5230/files/...`
+- Customer Web: `http://localhost:5173`
 - Admin Web: `http://localhost:5174`
 
 Админка: http://localhost:5174
@@ -145,3 +148,18 @@ Gateway -> Orders API -> Orders DB / Outbox -> RabbitMQ -> Notifications Worker
 dotnet ef database update --project Aspotus.Catalog.Api --startup-project Aspotus.Catalog.Api
 dotnet ef database update --project Aspotus.Orders.Api --startup-project Aspotus.Orders.Api
 dotnet ef database update --project Aspotus.Gateway --startup-project Aspotus.Gateway
+
+## Резервирование товаров
+
+Catalog API владеет остатками и резервами. Orders API не обращается к базе каталога напрямую:
+при оформлении он вызывает внутренний HTTP-контракт Catalog API, получает актуальные названия и цены,
+а затем сохраняет их снимок в заказе. Поэтому цена из браузера не считается доверенной.
+
+- автомобиль может находиться только в одном активном или завершённом заказе;
+- для запчастей учитывается свободный остаток: складской остаток минус все резервы;
+- отмена или удаление незавершённого заказа освобождает резерв;
+- завершённый заказ сохраняет товар недоступным как проданный и не может быть удалён;
+- повторное резервирование одного `orderId` и повторное освобождение безопасны.
+
+Статусы меняются через `PATCH /orders/api/orders/{id}/status`: `Created` → `Processing` →
+`Completed`, либо `Created`/`Processing` → `Cancelled`. Управлять статусами могут оператор и администратор.

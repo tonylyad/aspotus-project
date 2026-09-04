@@ -14,8 +14,12 @@ export default defineConfig([
       reactRefresh.configs.vite,
     ],
     languageOptions: {
-      globals: globals.browser,
+      globals: { ...globals.browser, ...globals.node },
       parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+    rules: {
+      // Загрузка данных при монтировании — ожидаемый сценарий страниц CRUD.
+      'react-hooks/set-state-in-effect': 'off',
     },
   },
 ])

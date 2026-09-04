@@ -47,7 +47,7 @@ export default function Cars() {
   const [deleteDialog, setDeleteDialog] = useState(false)
   const [selected, setSelected] = useState(null)
   const [form, setForm] = useState({
-    brandId: '', modelId: '', generationId: '', year: '', mileage: '',
+    brandId: '', modelId: '', generationId: '', year: '', mileage: '', price: '',
     bodyType: '', trimLevelName: '', trimLevelDescription: '',
     engineVolume: '', fuelType: '', transmissionType: '', driveType: '',
   })
@@ -101,7 +101,7 @@ export default function Cars() {
   const openCreate = () => {
     setSelected(null)
     setForm({
-      brandId: '', modelId: '', generationId: '', year: '', mileage: '',
+      brandId: '', modelId: '', generationId: '', year: '', mileage: '', price: '',
       bodyType: '', trimLevelName: '', trimLevelDescription: '',
       engineVolume: '', fuelType: '', transmissionType: '', driveType: '',
     })
@@ -120,6 +120,7 @@ export default function Cars() {
       generationId: item.generationId,
       year: String(item.year),
       mileage: String(item.mileage),
+      price: String(item.price),
       bodyType: item.bodyType,
       trimLevelName: item.trimLevelName || '',
       trimLevelDescription: item.trimLevelDescription || '',
@@ -144,6 +145,7 @@ export default function Cars() {
         generationId: form.generationId,
         year: parseInt(form.year, 10),
         mileage: parseInt(form.mileage, 10),
+        price: parseFloat(form.price),
         bodyType: form.bodyType,
         trimLevelName: form.trimLevelName || null,
         trimLevelDescription: form.trimLevelDescription || null,
@@ -214,6 +216,7 @@ export default function Cars() {
               <TableCell>Модель</TableCell>
               <TableCell>Поколение</TableCell>
               <TableCell>Год</TableCell>
+              <TableCell>Цена</TableCell>
               <TableCell>Кузов</TableCell>
               <TableCell>Двигатель</TableCell>
               <TableCell>Привод</TableCell>
@@ -222,9 +225,9 @@ export default function Cars() {
           </TableHead>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={9} align="center">Загрузка…</TableCell></TableRow>
+              <TableRow><TableCell colSpan={10} align="center">Загрузка…</TableCell></TableRow>
             ) : filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={9} align="center">Автомобили не найдены</TableCell></TableRow>
+              <TableRow><TableCell colSpan={10} align="center">Автомобили не найдены</TableCell></TableRow>
             ) : (
               filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((i) => (
                 <TableRow
@@ -240,6 +243,7 @@ export default function Cars() {
                   <TableCell>{i.modelName}</TableCell>
                   <TableCell>{i.generationName}</TableCell>
                   <TableCell>{i.year}</TableCell>
+                  <TableCell>{i.price?.toLocaleString('ru-RU')} ₸</TableCell>
                   <TableCell>{i.bodyType}</TableCell>
                   <TableCell>{i.engineVolume}L {i.fuelType}</TableCell>
                   <TableCell>{i.driveType}</TableCell>
@@ -285,6 +289,8 @@ export default function Cars() {
               <TextField label="Пробег (км)" type="number" value={form.mileage} onChange={setField('mileage')} required fullWidth slotProps={{ htmlInput: { min: 0 } }} />
             </Box>
 
+            <TextField label="Цена (₸)" type="number" value={form.price} onChange={setField('price')} required fullWidth slotProps={{ htmlInput: { min: 0.01, step: 0.01 } }} />
+
             <TextField label="Тип кузова" value={form.bodyType} onChange={setField('bodyType')} required fullWidth placeholder="Седан, Хэтчбек, Внедорожник…" />
 
             <Box className="form-fields__row">
@@ -308,7 +314,7 @@ export default function Cars() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialog(false)}>Отмена</Button>
-          <Button variant="contained" onClick={handleSave} disabled={saving || !form.brandId || !form.modelId || !form.generationId || !form.year || !form.bodyType}>
+          <Button variant="contained" onClick={handleSave} disabled={saving || !form.brandId || !form.modelId || !form.generationId || !form.year || !form.price || !form.bodyType}>
             {saving ? '…' : 'Сохранить'}
           </Button>
         </DialogActions>

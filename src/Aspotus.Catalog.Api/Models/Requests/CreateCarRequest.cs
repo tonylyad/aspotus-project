@@ -38,6 +38,12 @@ public class CreateCarRequest
     public int Mileage { get; set; }
 
     /// <summary>
+    /// Цена автомобиля.
+    /// </summary>
+    [Range(0.01, 1000000000, ErrorMessage = "Цена автомобиля должна быть больше 0.")]
+    public decimal Price { get; set; }
+
+    /// <summary>
     /// Тип кузова автомобиля.
     /// </summary>
     [Required(ErrorMessage = "Тип кузова обязателен для заполнения.")]

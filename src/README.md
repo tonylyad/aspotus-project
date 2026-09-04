@@ -7,3 +7,5 @@
 - Aspotus.Notifications.Worker - обработчик асинхронных уведомлений
 - Aspotus.Shared - общие DTO, enum, константы и исключения
 - Aspotus.Filestore.Api - внешнее хранилище файлов
+- Aspotus.Admin.Web - панель управления на React
+- Aspotus.Customer.Web - клиентский сайт на React

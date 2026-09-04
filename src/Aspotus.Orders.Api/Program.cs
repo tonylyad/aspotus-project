@@ -1,4 +1,5 @@
 using Aspotus.Orders.Api.Data.Context;
+using Aspotus.Orders.Api.Clients;
 using Aspotus.Orders.Api.Data.Repositories.Implementations;
 using Aspotus.Orders.Api.Data.Repositories.Interfaces;
 using Aspotus.Orders.Api.Extensions;
@@ -8,14 +9,22 @@ using Aspotus.Orders.Api.Services.Implementations;
 using Aspotus.Orders.Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddOrdersApiSwagger();
 
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddHttpClient<ICatalogInventoryClient, CatalogInventoryClient>((services, client) =>
+{
+    var configuration = services.GetRequiredService<IConfiguration>();
+    client.BaseAddress = new Uri(configuration["Catalog:BaseUrl"] ?? "http://localhost:5299/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 
 builder.Services.AddDbContext<OrdersDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("OrdersDb")));
