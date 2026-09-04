@@ -98,4 +98,6 @@ public class Part
     /// Список артикулов заменителей для данной запчасти.
     /// </summary>
     public ICollection<PartReplacement> ReplacementArticles { get; set; } = new List<PartReplacement>();
+
+    public ICollection<PartImage> Images { get; set; } = new List<PartImage>();
 }

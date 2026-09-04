@@ -137,7 +137,8 @@ public class PartService : IPartService
                     Id = Guid.NewGuid(),
                     ReplacementArticle = x
                 })
-                .ToList()
+                .ToList(),
+            Images = MapPartImages(request.Images)
         };
 
         await _partRepository.AddAsync(entity, cancellationToken);
@@ -208,7 +209,8 @@ public class PartService : IPartService
                     PartId = existingPart.Id,
                     ReplacementArticle = x
                 })
-                .ToList()
+                .ToList(),
+            Images = MapPartImages(request.Images, existingPart.Id)
         };
 
         await _partRepository.UpdateAsync(updatedPart, cancellationToken);
@@ -254,5 +256,25 @@ public class PartService : IPartService
                 throw new ValidationException("Для БУ-запчасти необходимо указать процент состояния.");
             }
         }
+    }
+
+    private static List<PartImage> MapPartImages(IEnumerable<CatalogImageRequest> images, Guid? partId = null)
+    {
+        var normalized = images
+            .Where(x => !string.IsNullOrWhiteSpace(x.FileKey) && !string.IsNullOrWhiteSpace(x.Url))
+            .GroupBy(x => x.FileKey.Trim(), StringComparer.OrdinalIgnoreCase)
+            .Select(x => x.First())
+            .OrderBy(x => x.SortOrder)
+            .ToList();
+
+        return normalized.Select((image, index) => new PartImage
+        {
+            Id = Guid.NewGuid(),
+            PartId = partId.GetValueOrDefault(),
+            FileKey = image.FileKey.Trim(),
+            Url = image.Url.Trim(),
+            SortOrder = index,
+            IsPrimary = index == 0
+        }).ToList();
     }
 }

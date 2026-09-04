@@ -14,10 +14,12 @@ namespace Aspotus.Catalog.Api.Data.Context
         public DbSet<CarModel> CarModels => Set<CarModel>();
         public DbSet<CarGeneration> CarGenerations => Set<CarGeneration>();
         public DbSet<Car> Cars => Set<Car>();
+        public DbSet<CarImage> CarImages => Set<CarImage>();
         public DbSet<PartReplacement> PartReplacements => Set<PartReplacement>();
         public DbSet<PartCategory> PartCategories => Set<PartCategory>();
         public DbSet<PartManufacturer> PartManufacturers => Set<PartManufacturer>();
         public DbSet<Part> Parts => Set<Part>();
+        public DbSet<PartImage> PartImages => Set<PartImage>();
 
         public DbSet<PartCompatibility> PartCompatibilities => Set<PartCompatibility>();
 

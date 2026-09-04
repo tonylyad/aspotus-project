@@ -82,4 +82,6 @@ public class UpdateCarRequest
     [Required(ErrorMessage = "Тип привода обязателен для заполнения.")]
     [StringLength(50, MinimumLength = 2, ErrorMessage = "Тип привода должен содержать от 2 до 50 символов.")]
     public string DriveType { get; set; } = null!;
+
+    public List<CatalogImageRequest> Images { get; set; } = new();
 }

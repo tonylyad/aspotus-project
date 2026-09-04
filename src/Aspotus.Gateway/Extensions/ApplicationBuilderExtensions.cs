@@ -21,6 +21,7 @@ public static class ApplicationBuilderExtensions
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "Gateway (Auth / Users / Roles)");
             options.SwaggerEndpoint("/catalog/swagger/v1/swagger.json", "Catalog (через /catalog)");
             options.SwaggerEndpoint("/orders/swagger/v1/swagger.json", "Orders (через /orders)");
+            options.SwaggerEndpoint("/files/swagger/v1/swagger.json", "Files (через /files)");
 
             options.RoutePrefix = "swagger";
             options.DefaultModelsExpandDepth(-1);

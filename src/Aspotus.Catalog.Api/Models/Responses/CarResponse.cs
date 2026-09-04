@@ -84,4 +84,6 @@ public class CarResponse
     /// Тип привода.
     /// </summary>
     public string DriveType { get; set; } = null!;
+
+    public List<CatalogImageResponse> Images { get; set; } = new();
 }

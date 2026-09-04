@@ -18,6 +18,7 @@ public static class CatalogSeedData
     {
         if (await context.CarBrands.AnyAsync())
         {
+            await AttachImagesToExistingSeedDataAsync(context);
             return;
         }
 
@@ -83,7 +84,7 @@ public static class CatalogSeedData
 
         var camryCar = new Car
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.Parse("4f41e6ed-023e-47ce-953b-0bbf1c6faf84"),
             BrandId = toyotaBrand.Id,
             ModelId = camryModel.Id,
             GenerationId = camryXv70Generation.Id,
@@ -95,12 +96,16 @@ public static class CatalogSeedData
             EngineVolume = 2.5m,
             FuelType = "Petrol",
             TransmissionType = "Automatic",
-            DriveType = "Fwd"
+            DriveType = "Fwd",
+            Images = CreateCarImages(
+                Guid.Parse("4f41e6ed-023e-47ce-953b-0bbf1c6faf84"),
+                "4f41e6ed-023e-47ce-953b-0bbf1c6faf84",
+                5)
         };
 
         var corollaCar = new Car
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.Parse("9815ff46-c614-4a98-b1e0-7ad7bf5453a2"),
             BrandId = toyotaBrand.Id,
             ModelId = corollaModel.Id,
             GenerationId = corollaE210Generation.Id,
@@ -112,12 +117,16 @@ public static class CatalogSeedData
             EngineVolume = 1.6m,
             FuelType = "Petrol",
             TransmissionType = "Automatic",
-            DriveType = "Fwd"
+            DriveType = "Fwd",
+            Images = CreateCarImages(
+                Guid.Parse("9815ff46-c614-4a98-b1e0-7ad7bf5453a2"),
+                "9815ff46-c614-4a98-b1e0-7ad7bf5453a2",
+                5)
         };
 
         var x5Car = new Car
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.Parse("dae455c6-22a7-4e90-822d-3796a557bf9a"),
             BrandId = bmwBrand.Id,
             ModelId = x5Model.Id,
             GenerationId = x5G05Generation.Id,
@@ -129,7 +138,11 @@ public static class CatalogSeedData
             EngineVolume = 3.0m,
             FuelType = "Diesel",
             TransmissionType = "Automatic",
-            DriveType = "Awd"
+            DriveType = "Awd",
+            Images = CreateCarImages(
+                Guid.Parse("dae455c6-22a7-4e90-822d-3796a557bf9a"),
+                "dae455c6-22a7-4e90-822d-3796a557bf9a",
+                5)
         };
 
         var engineCategory = new PartCategory
@@ -195,7 +208,7 @@ public static class CatalogSeedData
 
         var oilFilterPart = new Part
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.Parse("c585f6bf-8521-4f7b-904b-8dc91b8721d9"),
             Name = "Oil Filter",
             Article = "TOY-OF-001",
             Description = "Оригинальный масляный фильтр для бензиновых двигателей Toyota.",
@@ -208,6 +221,10 @@ public static class CatalogSeedData
             MileageAtRemoval = null,
             CategoryId = filtersCategory.Id,
             ManufacturerId = toyotaManufacturer.Id,
+            Images = CreatePartImages(
+                Guid.Parse("c585f6bf-8521-4f7b-904b-8dc91b8721d9"),
+                "c585f6bf-8521-4f7b-904b-8dc91b8721d9",
+                4),
             ReplacementArticles = new List<PartReplacement>
             {
                 new()
@@ -225,7 +242,7 @@ public static class CatalogSeedData
 
         var airFilterPart = new Part
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.Parse("f6df2972-c094-4cab-bfeb-0becdf8ac876"),
             Name = "Air Filter",
             Article = "BOS-AF-150",
             Description = "Воздушный фильтр двигателя для Toyota Camry XV70 и Corolla E210.",
@@ -238,6 +255,10 @@ public static class CatalogSeedData
             MileageAtRemoval = null,
             CategoryId = filtersCategory.Id,
             ManufacturerId = boschManufacturer.Id,
+            Images = CreatePartImages(
+                Guid.Parse("f6df2972-c094-4cab-bfeb-0becdf8ac876"),
+                "f6df2972-c094-4cab-bfeb-0becdf8ac876",
+                4),
             ReplacementArticles = new List<PartReplacement>
             {
                 new()
@@ -255,7 +276,7 @@ public static class CatalogSeedData
 
         var brakePadsPart = new Part
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.Parse("44c41429-a0c8-4d9d-8dca-b30b8fcb8556"),
             Name = "Front Brake Pads",
             Article = "BRE-PAD-330",
             Description = "Передние тормозные колодки для Toyota Camry XV70.",
@@ -268,6 +289,10 @@ public static class CatalogSeedData
             MileageAtRemoval = null,
             CategoryId = brakesCategory.Id,
             ManufacturerId = bremboManufacturer.Id,
+            Images = CreatePartImages(
+                Guid.Parse("44c41429-a0c8-4d9d-8dca-b30b8fcb8556"),
+                "44c41429-a0c8-4d9d-8dca-b30b8fcb8556",
+                4),
             ReplacementArticles = new List<PartReplacement>
             {
                 new()
@@ -285,7 +310,7 @@ public static class CatalogSeedData
 
         var shockAbsorberPart = new Part
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.Parse("59d52775-db46-483b-8f81-619b5e7b80df"),
             Name = "Rear Shock Absorber",
             Article = "KYB-RS-210",
             Description = "Задний амортизатор для Toyota Corolla E210.",
@@ -298,6 +323,10 @@ public static class CatalogSeedData
             MileageAtRemoval = null,
             CategoryId = suspensionCategory.Id,
             ManufacturerId = kybManufacturer.Id,
+            Images = CreatePartImages(
+                Guid.Parse("59d52775-db46-483b-8f81-619b5e7b80df"),
+                "59d52775-db46-483b-8f81-619b5e7b80df",
+                4),
             ReplacementArticles = new List<PartReplacement>
             {
                 new()
@@ -310,7 +339,7 @@ public static class CatalogSeedData
 
         var usedHeadlightPart = new Part
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.Parse("2eec5062-c276-4a4e-a31a-f8a1614c1e01"),
             Name = "Left Headlight",
             Article = "USED-CAMRY-HL-L-01",
             Description = "Левая передняя фара для Toyota Camry XV70.",
@@ -323,6 +352,10 @@ public static class CatalogSeedData
             MileageAtRemoval = 112000,
             CategoryId = bodyPartsCategory.Id,
             ManufacturerId = usedPartsWarehouseManufacturer.Id,
+            Images = CreatePartImages(
+                Guid.Parse("2eec5062-c276-4a4e-a31a-f8a1614c1e01"),
+                "2eec5062-c276-4a4e-a31a-f8a1614c1e01",
+                4),
             ReplacementArticles = new List<PartReplacement>
             {
                 new()
@@ -335,7 +368,7 @@ public static class CatalogSeedData
 
         var usedDoorMirrorPart = new Part
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.Parse("20a4aae5-d07d-4f7d-8cc2-a814700060fe"),
             Name = "Right Door Mirror",
             Article = "USED-BMW-MIR-R-03",
             Description = "Правое зеркало заднего вида для BMW X5 G05.",
@@ -348,6 +381,10 @@ public static class CatalogSeedData
             MileageAtRemoval = 64000,
             CategoryId = bodyPartsCategory.Id,
             ManufacturerId = usedPartsWarehouseManufacturer.Id,
+            Images = CreatePartImages(
+                Guid.Parse("20a4aae5-d07d-4f7d-8cc2-a814700060fe"),
+                "20a4aae5-d07d-4f7d-8cc2-a814700060fe",
+                4),
             ReplacementArticles = new List<PartReplacement>
             {
                 new()
@@ -428,4 +465,62 @@ public static class CatalogSeedData
 
         await context.SaveChangesAsync();
     }
+
+    private static async Task AttachImagesToExistingSeedDataAsync(CatalogDbContext context)
+    {
+        var partStorageIds = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["TOY-OF-001"] = "c585f6bf-8521-4f7b-904b-8dc91b8721d9",
+            ["BOS-AF-150"] = "f6df2972-c094-4cab-bfeb-0becdf8ac876",
+            ["BRE-PAD-330"] = "44c41429-a0c8-4d9d-8dca-b30b8fcb8556",
+            ["KYB-RS-210"] = "59d52775-db46-483b-8f81-619b5e7b80df",
+            ["USED-CAMRY-HL-L-01"] = "2eec5062-c276-4a4e-a31a-f8a1614c1e01",
+            ["USED-BMW-MIR-R-03"] = "20a4aae5-d07d-4f7d-8cc2-a814700060fe"
+        };
+
+        var parts = await context.Parts.Include(x => x.Images).ToListAsync();
+        foreach (var part in parts.Where(x => partStorageIds.ContainsKey(x.Article) && x.Images.Count == 0))
+        {
+            await context.PartImages.AddRangeAsync(
+                CreatePartImages(part.Id, partStorageIds[part.Article], 4));
+        }
+
+        var carStorageIds = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Camry"] = "4f41e6ed-023e-47ce-953b-0bbf1c6faf84",
+            ["Corolla"] = "9815ff46-c614-4a98-b1e0-7ad7bf5453a2",
+            ["X5"] = "dae455c6-22a7-4e90-822d-3796a557bf9a"
+        };
+
+        var cars = await context.Cars.Include(x => x.Model).Include(x => x.Images).ToListAsync();
+        foreach (var car in cars.Where(x => carStorageIds.ContainsKey(x.Model.Name) && x.Images.Count == 0))
+        {
+            await context.CarImages.AddRangeAsync(
+                CreateCarImages(car.Id, carStorageIds[car.Model.Name], 5));
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    private static List<CarImage> CreateCarImages(Guid carId, string storageId, int count) =>
+        Enumerable.Range(1, count).Select(index => new CarImage
+        {
+            Id = Guid.NewGuid(),
+            CarId = carId,
+            FileKey = $"cars/{storageId}/{index}.jpeg",
+            Url = $"https://part-images.storage.yandexcloud.net/cars/{storageId}/{index}.jpeg",
+            SortOrder = index - 1,
+            IsPrimary = index == 1
+        }).ToList();
+
+    private static List<PartImage> CreatePartImages(Guid partId, string storageId, int count) =>
+        Enumerable.Range(1, count).Select(index => new PartImage
+        {
+            Id = Guid.NewGuid(),
+            PartId = partId,
+            FileKey = $"parts/{storageId}/{index}.jpeg",
+            Url = $"https://part-images.storage.yandexcloud.net/parts/{storageId}/{index}.jpeg",
+            SortOrder = index - 1,
+            IsPrimary = index == 1
+        }).ToList();
 }

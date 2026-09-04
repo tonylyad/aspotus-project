@@ -28,6 +28,7 @@ public class CarRepository : ICarRepository
             .Include(x => x.Brand)
             .Include(x => x.Model)
             .Include(x => x.Generation)
+            .Include(x => x.Images)
             .OrderBy(x => x.Year)
             .ToListAsync(cancellationToken);
     }
@@ -40,6 +41,7 @@ public class CarRepository : ICarRepository
             .Include(x => x.Brand)
             .Include(x => x.Model)
             .Include(x => x.Generation)
+            .Include(x => x.Images)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
@@ -53,7 +55,13 @@ public class CarRepository : ICarRepository
     /// <inheritdoc />
     public async Task UpdateAsync(Car car, CancellationToken cancellationToken = default)
     {
-        _context.Cars.Update(car);
+        var existing = await _context.Cars
+            .Include(x => x.Images)
+            .FirstAsync(x => x.Id == car.Id, cancellationToken);
+
+        _context.Entry(existing).CurrentValues.SetValues(car);
+        _context.CarImages.RemoveRange(existing.Images);
+        await _context.CarImages.AddRangeAsync(car.Images, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
     }
 

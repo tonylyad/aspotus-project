@@ -32,7 +32,18 @@ public static class CarMapper
             EngineVolume = entity.EngineVolume,
             FuelType = entity.FuelType,
             TransmissionType = entity.TransmissionType,
-            DriveType = entity.DriveType
+            DriveType = entity.DriveType,
+            Images = entity.Images
+                .OrderBy(x => x.SortOrder)
+                .Select(x => new CatalogImageResponse
+                {
+                    Id = x.Id,
+                    FileKey = x.FileKey,
+                    Url = x.Url,
+                    SortOrder = x.SortOrder,
+                    IsPrimary = x.IsPrimary
+                })
+                .ToList()
         };
     }
 }

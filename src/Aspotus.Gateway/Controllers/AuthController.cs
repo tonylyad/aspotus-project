@@ -154,7 +154,7 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Выполняет вход администратора и возвращает JWT-токен.
+    /// Выполняет вход сотрудника в панель управления и возвращает JWT-токен.
     /// </summary>
     /// <param name="request">Данные для входа администратора.</param>
     /// <returns>JWT-токен и информация об авторизованном администраторе.</returns>
@@ -185,11 +185,12 @@ public class AuthController : ControllerBase
 
         var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
         var isOperator = await _userManager.IsInRoleAsync(user, "Operator");
-        if (!isAdmin && !isOperator)
+        var isContentModerator = await _userManager.IsInRoleAsync(user, "ContentModerator");
+        if (!isAdmin && !isOperator && !isContentModerator)
         {
             return Unauthorized(new
             {
-                message = "Доступ разрешён только администраторам и операторам."
+                message = "Доступ разрешён только администраторам, операторам и модераторам контента."
             });
         }
 

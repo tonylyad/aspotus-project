@@ -25,5 +25,5 @@ RUN dotnet publish "./Aspotus.Filestore.Api.csproj" -c $BUILD_CONFIGURATION -o /
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-EXPOSE 5299
+EXPOSE 5133
 ENTRYPOINT ["dotnet", "Aspotus.Filestore.Api.dll"]

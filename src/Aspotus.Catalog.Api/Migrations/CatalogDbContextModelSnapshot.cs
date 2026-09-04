@@ -124,6 +124,41 @@ namespace Aspotus.Catalog.Api.Migrations
                     b.ToTable("CarGenerations", (string)null);
                 });
 
+            modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.CarImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CarId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarId");
+
+                    b.HasIndex("FileKey")
+                        .IsUnique();
+
+                    b.ToTable("CarImages", (string)null);
+                });
+
             modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.CarModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -239,6 +274,41 @@ namespace Aspotus.Catalog.Api.Migrations
                     b.ToTable("PartCompatibilities", (string)null);
                 });
 
+            modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.PartImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("PartId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FileKey")
+                        .IsUnique();
+
+                    b.HasIndex("PartId");
+
+                    b.ToTable("PartImages", (string)null);
+                });
+
             modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.PartManufacturer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -314,6 +384,17 @@ namespace Aspotus.Catalog.Api.Migrations
                     b.Navigation("Model");
                 });
 
+            modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.CarImage", b =>
+                {
+                    b.HasOne("Aspotus.Catalog.Api.Data.Entities.Car", "Car")
+                        .WithMany("Images")
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Car");
+                });
+
             modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.CarModel", b =>
                 {
                     b.HasOne("Aspotus.Catalog.Api.Data.Entities.CarBrand", "Brand")
@@ -373,6 +454,17 @@ namespace Aspotus.Catalog.Api.Migrations
                     b.Navigation("Part");
                 });
 
+            modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.PartImage", b =>
+                {
+                    b.HasOne("Aspotus.Catalog.Api.Data.Entities.Part", "Part")
+                        .WithMany("Images")
+                        .HasForeignKey("PartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Part");
+                });
+
             modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.PartReplacement", b =>
                 {
                     b.HasOne("Aspotus.Catalog.Api.Data.Entities.Part", "Part")
@@ -386,6 +478,8 @@ namespace Aspotus.Catalog.Api.Migrations
 
             modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.Car", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("PartCompatibilities");
                 });
 
@@ -406,6 +500,8 @@ namespace Aspotus.Catalog.Api.Migrations
 
             modelBuilder.Entity("Aspotus.Catalog.Api.Data.Entities.Part", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("PartCompatibilities");
 
                     b.Navigation("ReplacementArticles");

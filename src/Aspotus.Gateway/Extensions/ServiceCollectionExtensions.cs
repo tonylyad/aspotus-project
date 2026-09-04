@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
 
 - /catalog — API каталога
 - /orders — API заказов
+- /files — API файлов
 
 Аутентификация:
 - JWT Bearer Token

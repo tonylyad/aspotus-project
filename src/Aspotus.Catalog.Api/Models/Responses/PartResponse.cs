@@ -86,4 +86,6 @@ public class PartResponse
     /// Название производителя.
     /// </summary>
     public string ManufacturerName { get; set; } = null!;
+
+    public List<CatalogImageResponse> Images { get; set; } = new();
 }

@@ -34,7 +34,18 @@ public static class PartMapper
             CategoryId = entity.CategoryId,
             CategoryName = entity.Category.Name,
             ManufacturerId = entity.ManufacturerId,
-            ManufacturerName = entity.Manufacturer.Name
+            ManufacturerName = entity.Manufacturer.Name,
+            Images = entity.Images
+                .OrderBy(x => x.SortOrder)
+                .Select(x => new CatalogImageResponse
+                {
+                    Id = x.Id,
+                    FileKey = x.FileKey,
+                    Url = x.Url,
+                    SortOrder = x.SortOrder,
+                    IsPrimary = x.IsPrimary
+                })
+                .ToList()
         };
     }
 }

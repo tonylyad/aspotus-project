@@ -9,7 +9,7 @@ namespace Aspotus.Gateway.Data.Seed;
 public static class GatewaySeedData
 {
     /// <summary>
-    /// Выполняет начальное заполнение ролей и администратора.
+    /// Выполняет начальное заполнение ролей и тестовых пользователей.
     /// </summary>
     public static async Task SeedAsync(IServiceProvider serviceProvider)
     {
@@ -32,43 +32,59 @@ public static class GatewaySeedData
             }
         }
 
-        const string adminLogin = "admin";
-        const string adminEmail = "admin@aspotus.com";
-        const string adminPassword = "123456";
-
-        var admin = await userManager.FindByNameAsync(adminLogin);
-
-        if (admin is null)
+        var seedUsers = new[]
         {
-            admin = await userManager.FindByEmailAsync(adminEmail);
+            new SeedUser("customer", "customer@aspotus.com", "Тестовый покупатель", "Customer"),
+            new SeedUser("moderator", "moderator@aspotus.com", "Модератор контента", "ContentModerator"),
+            new SeedUser("operator", "operator@aspotus.com", "Оператор заказов", "Operator"),
+            new SeedUser("admin", "admin@aspotus.com", "Главный админ", "Admin")
+        };
 
-            if (admin is not null)
+        foreach (var seedUser in seedUsers)
+        {
+            await EnsureUserAsync(userManager, seedUser);
+        }
+    }
+
+    private static async Task EnsureUserAsync(
+        UserManager<ApplicationUser> userManager,
+        SeedUser seedUser)
+    {
+        var user = await userManager.FindByNameAsync(seedUser.Login) ??
+                   await userManager.FindByEmailAsync(seedUser.Email);
+
+        if (user is null)
+        {
+            user = new ApplicationUser
             {
-                admin.UserName = adminLogin;
-                admin.FullName = "Главный админ";
-                await userManager.UpdateAsync(admin);
-            }
-            else
+                UserName = seedUser.Login,
+                Email = seedUser.Email,
+                FullName = seedUser.FullName
+            };
+
+            var createResult = await userManager.CreateAsync(user, SeedUser.Password);
+            if (!createResult.Succeeded)
             {
-                admin = new ApplicationUser
-                {
-                    UserName = adminLogin,
-                    Email = adminEmail,
-                    FullName = "Главный админ"
-                };
-
-                var createResult = await userManager.CreateAsync(admin, adminPassword);
+                var errors = string.Join("; ", createResult.Errors.Select(error => error.Description));
+                throw new InvalidOperationException(
+                    $"Не удалось создать seed-пользователя '{seedUser.Login}': {errors}");
             }
         }
-        else
-        {
-            admin.FullName = "Главный админ";
-            await userManager.UpdateAsync(admin);
-        }
 
-        if (admin is not null && !await userManager.IsInRoleAsync(admin, "Admin"))
+        if (!await userManager.IsInRoleAsync(user, seedUser.Role))
         {
-            await userManager.AddToRoleAsync(admin, "Admin");
+            var roleResult = await userManager.AddToRoleAsync(user, seedUser.Role);
+            if (!roleResult.Succeeded)
+            {
+                var errors = string.Join("; ", roleResult.Errors.Select(error => error.Description));
+                throw new InvalidOperationException(
+                    $"Не удалось назначить роль '{seedUser.Role}' пользователю '{seedUser.Login}': {errors}");
+            }
         }
+    }
+
+    private sealed record SeedUser(string Login, string Email, string FullName, string Role)
+    {
+        public const string Password = "123456";
     }
 }

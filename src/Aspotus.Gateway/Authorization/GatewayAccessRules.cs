@@ -27,6 +27,20 @@ public static class GatewayAccessRules
                 AllowedRoles = new[] { "ContentModerator", "Admin" }
             },
 
+            // Files: просмотр публичный, изменение — только модератор контента и админ
+            new()
+            {
+                PathPrefix = "/files",
+                Methods = new[] { "GET" },
+                AllowAnonymous = true
+            },
+            new()
+            {
+                PathPrefix = "/files",
+                Methods = new[] { "POST", "PUT", "PATCH", "DELETE" },
+                AllowedRoles = new[] { "ContentModerator", "Admin" }
+            },
+
             // Orders: создание заказа — только авторизованные покупатель / оператор / админ
             new()
             {

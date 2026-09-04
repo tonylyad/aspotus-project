@@ -101,7 +101,8 @@ public class CarService : ICarService
             EngineVolume = request.EngineVolume,
             FuelType = request.FuelType.Trim(),
             TransmissionType = request.TransmissionType.Trim(),
-            DriveType = request.DriveType.Trim()
+            DriveType = request.DriveType.Trim(),
+            Images = MapCarImages(request.Images)
         };
 
         await _carRepository.AddAsync(entity, cancellationToken);
@@ -166,7 +167,8 @@ public class CarService : ICarService
             EngineVolume = request.EngineVolume,
             FuelType = request.FuelType.Trim(),
             TransmissionType = request.TransmissionType.Trim(),
-            DriveType = request.DriveType.Trim()
+            DriveType = request.DriveType.Trim(),
+            Images = MapCarImages(request.Images, existingCar.Id)
         };
 
         await _carRepository.UpdateAsync(updatedCar, cancellationToken);
@@ -189,5 +191,25 @@ public class CarService : ICarService
         await _carRepository.DeleteAsync(id, cancellationToken);
 
         return true;
+    }
+
+    private static List<CarImage> MapCarImages(IEnumerable<CatalogImageRequest> images, Guid? carId = null)
+    {
+        var normalized = images
+            .Where(x => !string.IsNullOrWhiteSpace(x.FileKey) && !string.IsNullOrWhiteSpace(x.Url))
+            .GroupBy(x => x.FileKey.Trim(), StringComparer.OrdinalIgnoreCase)
+            .Select(x => x.First())
+            .OrderBy(x => x.SortOrder)
+            .ToList();
+
+        return normalized.Select((image, index) => new CarImage
+        {
+            Id = Guid.NewGuid(),
+            CarId = carId.GetValueOrDefault(),
+            FileKey = image.FileKey.Trim(),
+            Url = image.Url.Trim(),
+            SortOrder = index,
+            IsPrimary = index == 0
+        }).ToList();
     }
 }

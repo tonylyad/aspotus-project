@@ -24,8 +24,8 @@ namespace Aspotus.Filestore.Api.Controllers
             });
         }
 
-        [HttpGet("{key}")]
-        public async Task<IActionResult> GetById([FromQuery]string key, CancellationToken cancellationToken)
+        [HttpGet("{**key}")]
+        public async Task<IActionResult> GetById([FromRoute] string key, CancellationToken cancellationToken)
         {
             return await Execute(async () =>
             {
@@ -34,8 +34,9 @@ namespace Aspotus.Filestore.Api.Controllers
             });
         }
 
-        [HttpPost("{key}")]
-        public async Task<IActionResult> Create([FromQuery] string key, [FromBody] byte[] content, CancellationToken cancellationToken)
+        [HttpPost("{**key}")]
+        [Consumes("application/octet-stream")]
+        public async Task<IActionResult> Create([FromRoute] string key, [FromBody] byte[] content, CancellationToken cancellationToken)
         {
             return await Execute(async () =>
             {
@@ -44,8 +45,8 @@ namespace Aspotus.Filestore.Api.Controllers
             });
         }
 
-        [HttpDelete("{key}")]
-        public async Task<IActionResult> Delete([FromQuery] string key, CancellationToken cancellationToken)
+        [HttpDelete("{**key}")]
+        public async Task<IActionResult> Delete([FromRoute] string key, CancellationToken cancellationToken)
         {
             return await Execute(async () =>
             {

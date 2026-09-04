@@ -96,4 +96,6 @@ public class Car
     /// Список связей совместимости между автомобилем и запчастями.
     /// </summary>
     public ICollection<PartCompatibility> PartCompatibilities { get; set; } = new List<PartCompatibility>();
+
+    public ICollection<CarImage> Images { get; set; } = new List<CarImage>();
 }

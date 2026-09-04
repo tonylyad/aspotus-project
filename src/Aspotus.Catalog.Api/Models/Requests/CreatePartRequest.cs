@@ -86,6 +86,8 @@ public class CreatePartRequest : IValidatableObject
     [Required(ErrorMessage = "Производитель запчасти обязателен.")]
     public Guid ManufacturerId { get; set; }
 
+    public List<CatalogImageRequest> Images { get; set; } = new();
+
     /// <summary>
     /// Выполняет дополнительную бизнес-валидацию запроса.
     /// </summary>

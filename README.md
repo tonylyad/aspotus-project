@@ -74,6 +74,17 @@ docker compose -f src/docker-compose.yml ps
 
 - Catalog: `http://localhost:5230/catalog/...`
 - Orders: `http://localhost:5230/orders/...`
+- Files: `http://localhost:5230/files/...`
+- Admin Web: `http://localhost:5174`
+
+Админка: http://localhost:5174
+
+Тестовые пользователи создаются автоматически (пароль для всех — `123456`):
+
+- `admin` — администратор;
+- `operator` — оператор заказов;
+- `moderator` — модератор контента;
+- `customer` — покупатель.
 
 SQLite-базы хранятся на компьютере вне контейнеров:
 

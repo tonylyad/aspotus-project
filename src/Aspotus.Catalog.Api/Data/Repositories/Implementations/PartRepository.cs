@@ -28,6 +28,7 @@ public class PartRepository : IPartRepository
             .Include(x => x.Category)
             .Include(x => x.Manufacturer)
             .Include(x => x.ReplacementArticles)
+            .Include(x => x.Images)
             .OrderBy(x => x.Name)
             .ToListAsync(cancellationToken);
     }
@@ -40,6 +41,7 @@ public class PartRepository : IPartRepository
             .Include(x => x.Category)
             .Include(x => x.Manufacturer)
             .Include(x => x.ReplacementArticles)
+            .Include(x => x.Images)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
@@ -59,6 +61,7 @@ public class PartRepository : IPartRepository
             .Include(x => x.Category)
             .Include(x => x.Manufacturer)
             .Include(x => x.ReplacementArticles)
+            .Include(x => x.Images)
             .Where(x => x.CategoryId == categoryId)
             .OrderBy(x => x.Name)
             .ToListAsync(cancellationToken);
@@ -72,6 +75,7 @@ public class PartRepository : IPartRepository
             .Include(x => x.Category)
             .Include(x => x.Manufacturer)
             .Include(x => x.ReplacementArticles)
+            .Include(x => x.Images)
             .Include(x => x.PartCompatibilities)
             .Where(x => x.PartCompatibilities.Any(pc => pc.CarId == carId))
             .OrderBy(x => x.Name)
@@ -88,7 +92,16 @@ public class PartRepository : IPartRepository
     /// <inheritdoc />
     public async Task UpdateAsync(Part part, CancellationToken cancellationToken = default)
     {
-        _context.Parts.Update(part);
+        var existing = await _context.Parts
+            .Include(x => x.ReplacementArticles)
+            .Include(x => x.Images)
+            .FirstAsync(x => x.Id == part.Id, cancellationToken);
+
+        _context.Entry(existing).CurrentValues.SetValues(part);
+        _context.PartReplacements.RemoveRange(existing.ReplacementArticles);
+        _context.PartImages.RemoveRange(existing.Images);
+        await _context.PartReplacements.AddRangeAsync(part.ReplacementArticles, cancellationToken);
+        await _context.PartImages.AddRangeAsync(part.Images, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
     }
 

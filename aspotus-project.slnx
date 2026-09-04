@@ -8,6 +8,7 @@
   <Folder Name="/src/">
     <File Path="src/docker-compose.yml" />
     <File Path="src/README.md" />
+    <Project Path="src/Aspotus.Admin.Web/Aspotus.Admin.Web.esproj" />
     <Project Path="src/Aspotus.Catalog.Api/Aspotus.Catalog.Api.csproj" />
     <Project Path="src/Aspotus.Filestore.Api/Aspotus.Filestore.Api.csproj" Id="dd2259aa-c95c-4e6a-ad9c-2453dae6f3f8" />
     <Project Path="src/Aspotus.Gateway/Aspotus.Gateway.csproj" />
