@@ -5,6 +5,10 @@ const gatewayTarget = process.env.VITE_GATEWAY_URL ?? 'http://localhost:5230'
 
 export default defineConfig({
   plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.js',
+  },
   server: {
     proxy: {
       '/api': {

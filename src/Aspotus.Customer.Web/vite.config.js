@@ -5,6 +5,10 @@ const gatewayTarget = globalThis.process?.env.VITE_GATEWAY_URL ?? 'http://localh
 
 export default defineConfig({
     plugins: [plugin()],
+    test: {
+        environment: 'jsdom',
+        setupFiles: './src/test/setup.js',
+    },
     server: {
         port: 5173,
         proxy: {

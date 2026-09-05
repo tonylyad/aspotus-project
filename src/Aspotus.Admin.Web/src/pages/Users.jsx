@@ -239,7 +239,7 @@ export default function Users() {
                   <TableCell>{user.fullName}</TableCell>
                   <TableCell>{user.phoneNumber}</TableCell>
                   <TableCell>
-                    <Box display="flex" gap={0.5} flexWrap="wrap">
+                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
                       {user.roles.map((role) => (
                         <Chip key={role} label={roleLabels[role] ?? role} size="small" color="primary" variant="outlined" />
                       ))}

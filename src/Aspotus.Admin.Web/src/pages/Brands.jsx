@@ -234,7 +234,7 @@ export default function Brands() {
 
   return (
     <Box>
-      <Box display="flex" gap={3} flexWrap="wrap">
+      <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
         <Box sx={{ flex: '1 1 50%', minWidth: 0 }}>
           <CrudTable
             title="Бренды"

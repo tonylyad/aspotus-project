@@ -71,14 +71,13 @@ export default function Login() {
         sx={{ width: '100%', maxWidth: 400, p: 4 }}
         elevation={1}
       >
-        <Typography variant="h5" fontWeight={700} textAlign="center" gutterBottom>
+        <Typography variant="h5" fontWeight={700} sx={{ textAlign: 'center' }} gutterBottom>
           Aspotus Admin
         </Typography>
         <Typography
           variant="body2"
           color="text.secondary"
-          textAlign="center"
-          sx={{ mb: 3 }}
+          sx={{ mb: 3, textAlign: 'center' }}
         >
           Войдите в панель управления
         </Typography>
@@ -111,7 +110,7 @@ export default function Login() {
           required
           fullWidth
           size="small"
-          inputProps={{ autoComplete: 'new-password' }}
+          slotProps={{ htmlInput: { autoComplete: 'new-password' } }}
           sx={{ mb: 3 }}
         />
 

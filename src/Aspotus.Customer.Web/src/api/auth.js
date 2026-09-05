@@ -4,12 +4,13 @@ const normalizeUser = (user) => {
     if (!user) return null;
 
     if (Array.isArray(user)) {
-        const get = (type) => user.find(x => x.type.includes(type))?.value;
+        const get = (...types) => user.find((claim) => types.some((type) =>
+            claim.type === type || claim.type.endsWith(`/${type}`)))?.value;
 
         return {
-            id: get("nameidentifier") || get("sub"),
-            name: get("name") || get("sub"),
-            email: get("email")
+            id: get("nameidentifier", "sub"),
+            name: get("name", "sub"),
+            email: get("email", "emailaddress")
         };
     }
 

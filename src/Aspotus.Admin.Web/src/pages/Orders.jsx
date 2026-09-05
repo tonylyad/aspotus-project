@@ -172,8 +172,8 @@ export default function Orders() {
         </DialogTitle>
         <DialogContent dividers>
           {detailOrder && (
-            <Box display="flex" flexDirection="column" gap={2}>
-              <Box display="flex" gap={4} flexWrap="wrap">
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                 <Box>
                   <Typography variant="caption" color="text.secondary">Клиент</Typography>
                   <Typography>{detailOrder.customerName}</Typography>
@@ -187,7 +187,7 @@ export default function Orders() {
                   <Typography>{detailOrder.customerPhone || '—'}</Typography>
                 </Box>
               </Box>
-              <Box display="flex" gap={4} flexWrap="wrap">
+              <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                 <Box>
                   <Typography variant="caption" color="text.secondary">Адрес доставки</Typography>
                   <Typography>{detailOrder.deliveryAddress || '—'}</Typography>
@@ -265,8 +265,8 @@ export default function Orders() {
         <DialogActions>
           {detailOrder && (
             <FormControl size="small" sx={{ minWidth: 190, mr: 'auto' }}>
-              <InputLabel>Статус заказа</InputLabel>
-              <Select value={detailOrder.status} label="Статус заказа" onChange={(event) => updateStatus(event.target.value)}>
+              <InputLabel id="order-status-label">Статус заказа</InputLabel>
+              <Select labelId="order-status-label" value={detailOrder.status} label="Статус заказа" onChange={(event) => updateStatus(event.target.value)}>
                 {availableStatuses.map((status) => <MenuItem key={status} value={status}>{statusLabels[status]}</MenuItem>)}
               </Select>
             </FormControl>

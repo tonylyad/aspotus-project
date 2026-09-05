@@ -163,3 +163,33 @@ Catalog API владеет остатками и резервами. Orders API 
 
 Статусы меняются через `PATCH /orders/api/orders/{id}/status`: `Created` → `Processing` →
 `Completed`, либо `Created`/`Processing` → `Cancelled`. Управлять статусами могут оператор и администратор.
+
+## Тестирование
+
+Backend-тесты запускаются из корня репозитория:
+
+```powershell
+dotnet test
+```
+
+Компонентные и интеграционные тесты фронтендов используют Vitest и Testing Library:
+
+```powershell
+cd src/Aspotus.Customer.Web
+npm test
+
+cd ../Aspotus.Admin.Web
+npm test
+```
+
+Сквозные тесты используют Playwright. Они автоматически поднимают Docker Compose, если Gateway ещё не запущен:
+
+```powershell
+cd tests/Frontend.E2E
+npm install
+npx playwright install chromium
+npm test
+```
+
+E2E-набор проверяет доступность обоих фронтендов, защиту клиентских маршрутов, вход администратора и полный
+цикл резервирования автомобиля. Созданный тестовый заказ отменяется и удаляется в блоке очистки.

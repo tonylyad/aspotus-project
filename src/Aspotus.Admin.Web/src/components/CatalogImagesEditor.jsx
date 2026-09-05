@@ -71,7 +71,7 @@ export default function CatalogImagesEditor({ items, setItems, onRemoveStored })
 
   return (
     <Box>
-      <Box display="flex" alignItems="baseline" justifyContent="space-between" gap={2} mb={1.5}>
+      <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 2, mb: 1.5 }}>
         <Typography fontWeight={600}>Изображения</Typography>
         <Typography color="text.secondary" variant="body2">{items.length} из {MAX_IMAGES}</Typography>
       </Box>
@@ -84,7 +84,7 @@ export default function CatalogImagesEditor({ items, setItems, onRemoveStored })
         onDrop={dropFiles}
       >
         <AddPhotoAlternate className="catalog-dropzone__icon" />
-        <Typography fontWeight={600} textAlign="center">
+        <Typography fontWeight={600} sx={{ textAlign: 'center' }}>
           {items.length >= MAX_IMAGES ? 'Добавлено максимальное количество' : 'Перетащите фотографии сюда'}
         </Typography>
         <Typography color="text.secondary" variant="body2">или</Typography>
@@ -94,7 +94,7 @@ export default function CatalogImagesEditor({ items, setItems, onRemoveStored })
         </Button>
       </Box>
 
-      <Typography color="text.secondary" variant="caption" display="block" mt={1.25} mb={1.25}>
+      <Typography color="text.secondary" variant="caption" sx={{ display: 'block', mt: 1.25, mb: 1.25 }}>
         Перетаскивайте карточки, чтобы изменить порядок. Первая фотография будет главной.
       </Typography>
 

@@ -43,7 +43,7 @@ function MetricCard({ title, value, subtitle, icon }) {
   return (
     <Card sx={{ borderRadius: 3, boxShadow: '0 8px 28px rgba(15, 23, 42, 0.06)' }}>
       <CardContent>
-        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
+        <Stack direction="row" spacing={2} sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box>
             <Typography variant="body2" color="text.secondary">{title}</Typography>
             <Typography variant="h4" sx={{ mt: 0.75, fontWeight: 700 }}>{value}</Typography>
@@ -165,14 +165,14 @@ export default function Dashboard() {
 
         <Card sx={{ borderRadius: 3, boxShadow: '0 8px 28px rgba(15, 23, 42, 0.06)', mb: 3 }}>
           <CardContent>
-            <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
               <PhoneInTalkOutlinedIcon color="primary" fontSize="small" />
               <Typography variant="h6" fontWeight={700}>Обращения клиентов</Typography>
             </Stack>
             <Stack spacing={1.25}>
               {data.customerCallbacks.map((item) => (
                 <Box key={item.id} sx={{ p: 1.5, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
-                  <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" spacing={0.5}>
+                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={0.5} sx={{ justifyContent: 'space-between' }}>
                     <Typography fontWeight={600}>{item.name}</Typography>
                     <Typography variant="body2" color="text.secondary">{item.phone}</Typography>
                   </Stack>
@@ -186,7 +186,7 @@ export default function Dashboard() {
         <Box sx={{ display: 'grid', gap: 2.5, gridTemplateColumns: { xs: '1fr', xl: '1fr 1fr' } }}>
           <Card sx={{ borderRadius: 3, boxShadow: '0 8px 28px rgba(15, 23, 42, 0.06)' }}>
             <CardContent>
-              <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" spacing={1.5} mb={1.5}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ justifyContent: 'space-between', mb: 1.5 }}>
                 <Typography variant="h6" fontWeight={700}>Неоплаченные заказы</Typography>
                 <FormControl size="small" sx={{ minWidth: 220 }}>
                   <InputLabel>Фильтр по статусу</InputLabel>
@@ -231,7 +231,7 @@ export default function Dashboard() {
 
           <Card sx={{ borderRadius: 3, boxShadow: '0 8px 28px rgba(15, 23, 42, 0.06)' }}>
             <CardContent>
-              <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" spacing={1.5} mb={1.5}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ justifyContent: 'space-between', mb: 1.5 }}>
                 <Typography variant="h6" fontWeight={700}>Мои заказы</Typography>
                 <TextField
                   size="small"
@@ -375,7 +375,7 @@ export default function Dashboard() {
 
       <Card sx={{ borderRadius: 3, boxShadow: '0 8px 28px rgba(15, 23, 42, 0.06)' }}>
         <CardContent>
-          <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
             <NotificationsActiveOutlinedIcon color="primary" fontSize="small" />
             <Typography variant="h6" fontWeight={700}>Системные уведомления</Typography>
           </Stack>
@@ -392,8 +392,8 @@ export default function Dashboard() {
                   backgroundColor: 'background.paper',
                 }}
               >
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} justifyContent="space-between" mb={0.5}>
-                  <Stack direction="row" spacing={1} alignItems="center">
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ justifyContent: 'space-between', mb: 0.5 }}>
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
                     <Typography fontWeight={600}>{item.title}</Typography>
                     <Chip size="small" label={item.level} variant="outlined" />
                   </Stack>

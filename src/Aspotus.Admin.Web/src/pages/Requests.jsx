@@ -70,8 +70,8 @@ export default function Requests() {
               <TableCell>{typeLabels[item.type] || item.type}</TableCell><TableCell>{item.customerName}</TableCell>
               <TableCell>{item.customerPhone}<br /><small>{item.customerEmail}</small></TableCell>
               <TableCell sx={{ maxWidth: 300 }}>{formatDetails(item.detailsJson)}</TableCell><TableCell>{item.comment || '—'}</TableCell>
-              <TableCell sx={{ minWidth: 170 }}><FormControl size="small" fullWidth><InputLabel>Статус</InputLabel>
-                <Select value={item.status} label="Статус" onChange={(event) => updateStatus(item, event.target.value)}
+              <TableCell sx={{ minWidth: 170 }}><FormControl size="small" fullWidth><InputLabel id={`request-status-${item.id}`}>Статус</InputLabel>
+                <Select labelId={`request-status-${item.id}`} value={item.status} label="Статус" onChange={(event) => updateStatus(item, event.target.value)}
                   renderValue={(value) => <Chip size="small" label={statusLabels[value] || value} color={statusColors[value] || 'default'} />}>
                   {Object.entries(statusLabels).map(([value, label]) => <MenuItem key={value} value={value}>{label}</MenuItem>)}
                 </Select></FormControl></TableCell>
