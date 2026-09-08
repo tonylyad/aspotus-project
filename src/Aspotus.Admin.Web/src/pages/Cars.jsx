@@ -13,6 +13,7 @@ import {
   toImageRequests,
   uploadCatalogImages,
 } from '../utils/catalogImages'
+import { getApiErrorMessage, validateCarForm } from '../utils/carForm'
 
 const API = '/catalog/api'
 
@@ -62,7 +63,7 @@ async function apiSave(url, method, body) {
   const res = await fetch(url, { method, headers, body: JSON.stringify(body) })
   if (!res.ok) {
     const data = await res.json().catch(() => null)
-    throw new Error(data?.message || data?.title || 'Ошибка сохранения')
+    throw new Error(getApiErrorMessage(data))
   }
   return res.status === 204 ? null : res.json()
 }
@@ -87,6 +88,7 @@ export default function Cars() {
   const [saving, setSaving] = useState(false)
   const [images, setImages] = useState([])
   const [removedImageKeys, setRemovedImageKeys] = useState([])
+  const [fieldErrors, setFieldErrors] = useState({})
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' })
 
   const fetchItems = useCallback(async () => {
@@ -120,6 +122,7 @@ export default function Cars() {
   function setField(field) {
     return async (e) => {
       const value = e.target.value
+      setFieldErrors((current) => ({ ...current, [field]: undefined }))
       setForm((prev) => {
         const next = { ...prev, [field]: value }
         if (field === 'brandId') { next.modelId = ''; next.generationId = '' }
@@ -142,6 +145,7 @@ export default function Cars() {
     setGenerations([])
     setImages([])
     setRemovedImageKeys([])
+    setFieldErrors({})
     setDialog(true)
   }
 
@@ -164,25 +168,34 @@ export default function Cars() {
     })
     setImages(item.images || [])
     setRemovedImageKeys([])
+    setFieldErrors({})
     await fetchModelsByBrand(item.brandId)
     await fetchGenerationsByModel(item.modelId)
     setDialog(true)
   }
 
   const handleSave = async () => {
+    const validation = validateCarForm(form, generations)
+    if (Object.keys(validation.errors).length > 0) {
+      setFieldErrors(validation.errors)
+      setSnackbar({ open: true, message: Object.values(validation.errors)[0], severity: 'error' })
+      return
+    }
+
+    setFieldErrors({})
     setSaving(true)
     try {
       const body = {
         brandId: form.brandId,
         modelId: form.modelId,
         generationId: form.generationId,
-        year: parseInt(form.year, 10),
-        mileage: parseInt(form.mileage, 10),
-        price: parseFloat(form.price),
+        year: validation.values.year,
+        mileage: validation.values.mileage,
+        price: validation.values.price,
         bodyType: form.bodyType,
         trimLevelName: form.trimLevelName || null,
         trimLevelDescription: form.trimLevelDescription || null,
-        engineVolume: parseFloat(form.engineVolume),
+        engineVolume: validation.values.engineVolume,
         fuelType: form.fuelType,
         transmissionType: form.transmissionType,
         driveType: form.driveType,
@@ -318,11 +331,11 @@ export default function Cars() {
             </FormControl>
 
             <Box className="form-fields__row">
-              <TextField label="Год" type="number" value={form.year} onChange={setField('year')} required fullWidth slotProps={{ htmlInput: { min: 1900, max: 3000 } }} />
-              <TextField label="Пробег (км)" type="number" value={form.mileage} onChange={setField('mileage')} required fullWidth slotProps={{ htmlInput: { min: 0 } }} />
+              <TextField label="Год" type="number" value={form.year} onChange={setField('year')} required fullWidth error={Boolean(fieldErrors.year)} helperText={fieldErrors.year} slotProps={{ htmlInput: { min: 1900, max: 3000 } }} />
+              <TextField label="Пробег (км)" type="number" value={form.mileage} onChange={setField('mileage')} required fullWidth error={Boolean(fieldErrors.mileage)} helperText={fieldErrors.mileage} slotProps={{ htmlInput: { min: 0 } }} />
             </Box>
 
-            <TextField label="Цена (₽)" type="number" value={form.price} onChange={setField('price')} required fullWidth slotProps={{ htmlInput: { min: 0.01, step: 0.01 } }} />
+            <TextField label="Цена (₽)" type="text" value={form.price} onChange={setField('price')} required fullWidth error={Boolean(fieldErrors.price)} helperText={fieldErrors.price} slotProps={{ htmlInput: { inputMode: 'decimal' } }} />
 
             <FormControl fullWidth required>
               <InputLabel>Тип кузова</InputLabel>
@@ -332,7 +345,7 @@ export default function Cars() {
             </FormControl>
 
             <Box className="form-fields__row">
-              <TextField label="Объём двигателя (L)" type="number" value={form.engineVolume} onChange={setField('engineVolume')} required fullWidth slotProps={{ htmlInput: { min: 0.1, max: 20, step: 0.1 } }} />
+              <TextField label="Объём двигателя (L)" type="text" value={form.engineVolume} onChange={setField('engineVolume')} required fullWidth error={Boolean(fieldErrors.engineVolume)} helperText={fieldErrors.engineVolume} slotProps={{ htmlInput: { inputMode: 'decimal' } }} />
               <FormControl fullWidth required>
                 <InputLabel>Тип двигателя</InputLabel>
                 <Select value={form.fuelType} label="Тип двигателя" onChange={setField('fuelType')}>
