@@ -35,6 +35,19 @@ describe('API заказов и авторизации', () => {
     })
   })
 
+  it('использует телефон профиля, если форма заказа его не переопределила', async () => {
+    api.post.mockResolvedValue({ data: { id: 'order-3' } })
+    await createCarOrder(
+      [{ id: 'car-1' }],
+      { deliveryAddress: 'Москва' },
+      { id: 'user-1', name: 'Иван', email: 'ivan@test.ru', phoneNumber: '+79990000000' },
+    )
+
+    expect(api.post).toHaveBeenCalledWith('/orders/api/orders/cars', expect.objectContaining({
+      customerPhone: '+79990000000',
+    }))
+  })
+
   it('понимает пользователя, представленного claims', async () => {
     api.post.mockResolvedValue({ data: {} })
     await createCarOrder([{ id: 'car-1' }], { customerPhone: '1', deliveryAddress: 'A' }, [

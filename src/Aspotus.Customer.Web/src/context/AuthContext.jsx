@@ -12,6 +12,7 @@ const parseClaims = (claimsArray) => {
         id: get("sub") || get("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"),
         email: get("email") || get("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"),
         name: get("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"),
+        phoneNumber: get("phone_number") || get("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone"),
         role: get("http://schemas.microsoft.com/ws/2008/06/identity/claims/role"),
     };
 };

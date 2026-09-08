@@ -40,11 +40,14 @@ describe('AuthProvider', () => {
     api.getProfile.mockResolvedValue({ data: [
       { type: 'sub', value: 'user-1' },
       { type: 'email', value: 'user@test.ru' },
+      { type: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone', value: '+79990000000' },
       { type: 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role', value: 'Customer' },
     ] })
     const { result } = renderHook(() => useAuth(), { wrapper })
     await waitFor(() => expect(result.current.isAuthenticated).toBe(true))
-    expect(result.current.user).toMatchObject({ id: 'user-1', email: 'user@test.ru', role: 'Customer' })
+    expect(result.current.user).toMatchObject({
+      id: 'user-1', email: 'user@test.ru', phoneNumber: '+79990000000', role: 'Customer',
+    })
   })
 
   it('сохраняет токен после входа и загружает профиль', async () => {

@@ -59,11 +59,11 @@ export default function Header() {
                             as={Link}
                             to="/cart"
                             className="header-cart-link"
-                            aria-label={`Корзина: ${cartItemCount} товаров`}
+                            aria-label={cartItemCount > 0 ? `Корзина: ${cartItemCount} товаров` : 'Корзина пуста'}
                             title="Корзина"
                         >
                             <FiShoppingCart aria-hidden="true" />
-                            <span className="header-cart-count">{cartItemCount}</span>
+                            {cartItemCount > 0 && <span className="header-cart-count">{cartItemCount}</span>}
                         </Nav.Link>
 
                         {user ? (

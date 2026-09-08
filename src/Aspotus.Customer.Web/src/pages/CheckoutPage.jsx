@@ -16,7 +16,12 @@ export default function CheckoutPage() {
   const isCars = type === 'cars'
   const items = isCars ? cars : parts
   const total = isCars ? carsTotal : partsTotal
-  const [form, setForm] = useState({ customerName: user?.name || '', customerEmail: user?.email || '', customerPhone: '', deliveryAddress: '' })
+  const [form, setForm] = useState({
+    customerName: user?.fullName || user?.name || '',
+    customerEmail: user?.email || '',
+    customerPhone: user?.phoneNumber || user?.phone || '',
+    deliveryAddress: '',
+  })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -48,13 +53,13 @@ export default function CheckoutPage() {
           <h2 className="auth-title">Оформление заказа: {isCars ? 'автомобиль' : 'запчасти'}</h2>
           {error && <Alert variant="danger">{error}</Alert>}
           <Form onSubmit={handleSubmit}>
-            <Form.Group className="form-group-custom"><Form.Label>Имя</Form.Label>
+            <Form.Group className="form-group-custom" controlId="checkoutCustomerName"><Form.Label>Имя</Form.Label>
               <Form.Control name="customerName" value={form.customerName} onChange={change} required /></Form.Group>
-            <Form.Group className="form-group-custom"><Form.Label>Email</Form.Label>
+            <Form.Group className="form-group-custom" controlId="checkoutCustomerEmail"><Form.Label>Email</Form.Label>
               <Form.Control type="email" name="customerEmail" value={form.customerEmail} onChange={change} required /></Form.Group>
-            <Form.Group className="form-group-custom"><Form.Label>Телефон</Form.Label>
+            <Form.Group className="form-group-custom" controlId="checkoutCustomerPhone"><Form.Label>Телефон</Form.Label>
               <Form.Control type="tel" name="customerPhone" value={form.customerPhone} onChange={change} placeholder="+7 (999) 000-00-00" required /></Form.Group>
-            <Form.Group className="form-group-custom"><Form.Label>Адрес доставки</Form.Label>
+            <Form.Group className="form-group-custom" controlId="checkoutDeliveryAddress"><Form.Label>Адрес доставки</Form.Label>
               <Form.Control as="textarea" rows={3} name="deliveryAddress" value={form.deliveryAddress} onChange={change} required /></Form.Group>
 
             <div className="mt-4 mb-3 p-3 bg-dark rounded"><h5>Состав заказа</h5>

@@ -21,6 +21,10 @@ public static class IdentityExtensions
             .AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.User.RequireUniqueEmail = true;
+                options.User.AllowedUserNameCharacters =
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+" +
+                    "абвгдеёжзийклмнопрстуфхцчшщъыьэюя" +
+                    "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
 
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;

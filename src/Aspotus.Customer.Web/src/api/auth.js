@@ -10,7 +10,8 @@ const normalizeUser = (user) => {
         return {
             id: get("nameidentifier", "sub"),
             name: get("name", "sub"),
-            email: get("email", "emailaddress")
+            email: get("email", "emailaddress"),
+            phoneNumber: get("phone_number", "mobilephone")
         };
     }
 
@@ -27,7 +28,7 @@ export const createPartOrder = async (cart, delivery, user) => {
     const orderRequest = {
         customerName: delivery.customerName || normalizedUser.name,
         customerEmail: delivery.customerEmail || normalizedUser.email,
-        customerPhone: delivery.customerPhone,
+        customerPhone: delivery.customerPhone || normalizedUser.phoneNumber,
         deliveryAddress: delivery.deliveryAddress,
         items: cart.map(item => ({
             partId: item.id,
@@ -48,7 +49,7 @@ export const createCarOrder = async (cart, delivery, user) => {
     const orderRequest = {
         customerName: delivery.customerName || normalizedUser.name,
         customerEmail: delivery.customerEmail || normalizedUser.email,
-        customerPhone: delivery.customerPhone,
+        customerPhone: delivery.customerPhone || normalizedUser.phoneNumber,
         deliveryAddress: delivery.deliveryAddress,
         car: {
             carId: cart[0].id
