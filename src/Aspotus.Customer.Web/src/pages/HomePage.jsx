@@ -197,7 +197,7 @@ export default function HomePage() {
                                     <Card.Body>
                                         <h4>{part.name}</h4>
                                         <p>Артикул: <strong>{part.article || "—"}</strong></p>
-                                        <div className="home-part-card__price">{part.price} ₸</div>
+                                        <div className="home-part-card__price">{Number(part.price || 0).toLocaleString('ru-RU')} ₽</div>
                                         <span>Подробнее
                                             <FiArrowRight />
                                         </span>

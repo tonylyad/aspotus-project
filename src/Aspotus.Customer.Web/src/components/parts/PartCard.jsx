@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Badge, Button, Card } from 'react-bootstrap'
 import { motion } from 'framer-motion'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useImage } from '../../hooks/useImage'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
@@ -22,8 +22,19 @@ export default function PartCard({ part }) {
     setTimeout(() => setShowAddedMessage(false), 2500)
   }
 
+  const openDetails = () => navigate(`/parts/${part.id}`)
+
   return <motion.div whileHover={{ scale: 1.03, y: -10 }} className="h-100">
-    <Card className="shadow border-0 h-100">
+    <Card
+      className="shadow border-0 h-100 catalog-product-card"
+      role="link"
+      tabIndex={0}
+      aria-label={`Открыть запчасть ${part.name || ''}`.trim()}
+      onClick={openDetails}
+      onKeyDown={(event) => {
+        if (event.target === event.currentTarget && event.key === 'Enter') openDetails()
+      }}
+    >
       <div className="image-container"><Card.Img variant="top" src={image} alt={part.name} loading="lazy" />
         <div className="corner-badge">{part.conditionType === 1 ? 'Новое' : 'Б/У'}</div></div>
       <Card.Body>
@@ -31,11 +42,10 @@ export default function PartCard({ part }) {
         <Card.Title className="mt-3">{part.name}</Card.Title>
         <Card.Text>Артикул: <strong>{part.article || '—'}</strong></Card.Text>
         <Card.Text className="fs-5 fw-bold">{formatPrice(part.price)}</Card.Text>
-        <div className="d-flex justify-content-between align-items-center gap-2">
-          <Button as={Link} to={`/parts/${part.id}`}>Подробнее</Button>
+        <div className="d-flex justify-content-end align-items-center gap-2">
           <div className="cart-button-container">
             <div className={`added-to-cart-message ${showAddedMessage ? 'visible' : ''}`}>Добавлено в корзину!</div>
-            <Button variant="outline-secondary" size="sm" disabled={!available} onClick={handleAdd}
+            <Button variant="outline-secondary" size="sm" disabled={!available} onClick={(event) => { event.stopPropagation(); handleAdd() }}
               title={available ? 'Добавить в корзину' : 'Запчасти нет в наличии'}>
               <img src="/cardIcon.png" alt="Корзина" style={{ width: 32, height: 32 }} />
             </Button>

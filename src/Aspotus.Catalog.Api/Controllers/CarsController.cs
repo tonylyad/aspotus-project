@@ -21,8 +21,9 @@ public class CarsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
-        var result = await _carService.GetAllAsync(cancellationToken);
+        var result = (await _carService.GetAllAsync(cancellationToken)).ToList();
         await ApplyAvailabilityAsync(result, cancellationToken);
+        await RemoveCompletedCarsForCustomersAsync(result, cancellationToken);
         return Ok(result);
     }
 
@@ -37,6 +38,7 @@ public class CarsController : ControllerBase
         pageSize = Math.Clamp(pageSize, 1, 100);
         var items = (await _carService.GetAllAsync(cancellationToken)).ToList();
         await ApplyAvailabilityAsync(items, cancellationToken);
+        await RemoveCompletedCarsForCustomersAsync(items, cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(query))
         {
@@ -89,5 +91,20 @@ public class CarsController : ControllerBase
         if (_reservationService is null) return;
         var reservedIds = await _reservationService.GetReservedCarIdsAsync(cancellationToken);
         foreach (var car in cars) car.IsAvailable = !reservedIds.Contains(car.Id);
+    }
+
+    private async Task RemoveCompletedCarsForCustomersAsync(List<CarResponse> cars, CancellationToken cancellationToken)
+    {
+        if (_reservationService is null || CanManageCatalog()) return;
+        var completedIds = await _reservationService.GetCompletedCarIdsAsync(cancellationToken);
+        cars.RemoveAll(car => completedIds.Contains(car.Id));
+    }
+
+    private bool CanManageCatalog()
+    {
+        var roles = Request.Headers["X-User-Roles"].ToString()
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        return roles.Contains("Admin", StringComparer.OrdinalIgnoreCase) ||
+               roles.Contains("ContentModerator", StringComparer.OrdinalIgnoreCase);
     }
 }

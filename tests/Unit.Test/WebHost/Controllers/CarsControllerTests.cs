@@ -4,6 +4,7 @@ using Aspotus.Catalog.Api.Models.Responses;
 using Aspotus.Catalog.Api.Services.Interfaces;
 using AwesomeAssertions;
 using Bogus;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -82,6 +83,48 @@ namespace Unit.Test.WebHost.Controllers
             okResult!.StatusCode.Should().Be(200);
             okResult!.Value.Should().BeEquivalentTo(request);
             _serviceMock.Verify(x => x.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetAll_ShouldHideCompletedCar_FromCustomerCatalog()
+        {
+            var cars = GenerateCarResponses(2);
+            var reservationService = new Mock<IInventoryReservationService>();
+            _serviceMock.Setup(x => x.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(cars);
+            reservationService.Setup(x => x.GetReservedCarIdsAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync([cars[0].Id]);
+            reservationService.Setup(x => x.GetCompletedCarIdsAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync([cars[0].Id]);
+            var controller = new CarsController(_serviceMock.Object, reservationService.Object)
+            {
+                ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() }
+            };
+
+            var result = await controller.GetAll(CancellationToken.None);
+
+            var returnedCars = ((OkObjectResult)result).Value.Should().BeAssignableTo<IEnumerable<CarResponse>>().Subject;
+            returnedCars.Should().ContainSingle().Which.Id.Should().Be(cars[1].Id);
+        }
+
+        [Fact]
+        public async Task GetAll_ShouldKeepCompletedCar_ForContentModerator()
+        {
+            var cars = GenerateCarResponses(2);
+            var reservationService = new Mock<IInventoryReservationService>();
+            _serviceMock.Setup(x => x.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(cars);
+            reservationService.Setup(x => x.GetReservedCarIdsAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync([cars[0].Id]);
+            var context = new DefaultHttpContext();
+            context.Request.Headers["X-User-Roles"] = "ContentModerator";
+            var controller = new CarsController(_serviceMock.Object, reservationService.Object)
+            {
+                ControllerContext = new ControllerContext { HttpContext = context }
+            };
+
+            var result = await controller.GetAll(CancellationToken.None);
+
+            ((OkObjectResult)result).Value.Should().BeEquivalentTo(cars);
+            reservationService.Verify(x => x.GetCompletedCarIdsAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]

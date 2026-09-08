@@ -32,6 +32,7 @@ builder.Services.AddDbContext<OrdersDbContext>(options =>
 builder.Services.Configure<RabbitMqOptions>(
     builder.Configuration.GetSection(RabbitMqOptions.SectionName));
 builder.Services.AddHostedService<OutboxPublisher>();
+builder.Services.AddHostedService<CompletedOrderReconciliationWorker>();
 
 // програмный поиск сертификата для запуска службы через docker
 builder.WebHost.ConfigureKestrel(options =>

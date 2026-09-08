@@ -92,11 +92,37 @@ public class InventoryReservationService : IInventoryReservationService
         await _context.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task CompleteAsync(Guid orderId, CancellationToken cancellationToken = default)
+    {
+        var reservation = await _context.InventoryReservations
+            .FirstOrDefaultAsync(x => x.OrderId == orderId, cancellationToken);
+
+        if (reservation is null || reservation.CompletedAtUtc.HasValue)
+        {
+            return;
+        }
+
+        reservation.CompletedAtUtc = DateTime.UtcNow;
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task<HashSet<Guid>> GetReservedCarIdsAsync(CancellationToken cancellationToken = default)
     {
         var ids = await _context.InventoryReservationItems
             .AsNoTracking()
             .Where(x => x.ProductType == CarProductType)
+            .Select(x => x.ProductId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
+        return ids.ToHashSet();
+    }
+
+    public async Task<HashSet<Guid>> GetCompletedCarIdsAsync(CancellationToken cancellationToken = default)
+    {
+        var ids = await _context.InventoryReservationItems
+            .AsNoTracking()
+            .Where(x => x.ProductType == CarProductType && x.Reservation.CompletedAtUtc != null)
             .Select(x => x.ProductId)
             .Distinct()
             .ToListAsync(cancellationToken);

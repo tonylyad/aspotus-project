@@ -64,7 +64,7 @@ const Profile = () => {
                                 <Card.Body className="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6>Заказ #{order.id.slice(0, 8)}</h6>
-                                        <div>💰 {order.totalAmount} ₸</div>
+                                        <div>💰 {Number(order.totalAmount || 0).toLocaleString('ru-RU')} ₽</div>
                                         <div>📅 {new Date(order.createdAtUtc).toLocaleString()}</div>
                                     </div>
 

@@ -288,7 +288,7 @@ export default function Parts() {
                   <TableCell>{p.article}</TableCell>
                   <TableCell>{p.categoryName}</TableCell>
                   <TableCell>{p.manufacturerName}</TableCell>
-                  <TableCell>{p.price.toLocaleString('ru')} ₽</TableCell>
+                  <TableCell>{p.price.toLocaleString('ru-RU')} ₽</TableCell>
                   <TableCell>{p.stockQuantity}</TableCell>
                   <TableCell>{conditionLabels[p.conditionType] || p.conditionType}</TableCell>
                   <TableCell align="right">

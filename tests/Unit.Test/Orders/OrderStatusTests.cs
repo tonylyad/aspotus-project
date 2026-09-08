@@ -12,6 +12,24 @@ namespace Unit.Test.Orders;
 public sealed class OrderStatusTests
 {
     [Fact]
+    public async Task CompletedOrder_FinalizesCatalogReservation()
+    {
+        var order = new Order { Id = Guid.NewGuid(), Status = OrderStatus.Processing };
+        var repository = new Mock<IOrderRepository>();
+        repository.Setup(x => x.GetByIdAsync(order.Id, It.IsAny<CancellationToken>())).ReturnsAsync(order);
+        repository.Setup(x => x.UpdateAsync(order, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        var catalog = new Mock<ICatalogInventoryClient>();
+        catalog.Setup(x => x.CompleteAsync(order.Id, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        var service = new OrderService(repository.Object, catalog.Object);
+
+        var result = await service.UpdateStatusAsync(order.Id, new UpdateOrderStatusRequest { Status = OrderStatus.Completed });
+
+        result!.Status.Should().Be(nameof(OrderStatus.Completed));
+        catalog.Verify(x => x.CompleteAsync(order.Id, It.IsAny<CancellationToken>()), Times.Once);
+        catalog.Verify(x => x.ReleaseAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task CancelledOrder_ReleasesCatalogReservation()
     {
         var order = new Order { Id = Guid.NewGuid(), Status = OrderStatus.Processing };

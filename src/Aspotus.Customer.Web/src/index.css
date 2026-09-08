@@ -23,6 +23,44 @@ body {
     backdrop-filter: blur(10px);
 }
 
+.header-cart-link {
+    position: relative;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    min-height: 40px;
+    margin: 0 10px;
+    font-size: 1.45rem;
+}
+
+.header-cart-count {
+    position: absolute;
+    top: 1px;
+    right: 0;
+    display: grid;
+    place-items: center;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    border: 2px solid var(--bs-dark);
+    border-radius: 999px;
+    background: var(--bs-danger);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+@media (max-width: 991.98px) {
+    .header-cart-link {
+        justify-content: flex-start;
+        width: max-content;
+        margin: 4px 0;
+        padding-right: 20px !important;
+    }
+}
+
 img {
     border-radius: 20px;
 }

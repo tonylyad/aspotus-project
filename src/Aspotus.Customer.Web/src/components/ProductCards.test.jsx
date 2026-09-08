@@ -35,13 +35,14 @@ describe('карточки каталога', () => {
     renderCard(<CarCard car={car} />)
     expect(screen.getByText('Toyota')).toBeInTheDocument()
     expect(screen.getByText('Camry')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Подробнее/i })).toHaveAttribute('href', '/cars/car-1')
+    fireEvent.click(screen.getByRole('link', { name: 'Открыть автомобиль Toyota Camry' }))
+    expect(navigate).toHaveBeenCalledWith('/cars/car-1')
   })
 
   it('блокирует добавление недоступного автомобиля', () => {
     renderCard(<CarCard car={{ ...car, isAvailable: false }} />)
     expect(screen.getByRole('button', { name: 'Корзина' })).toBeDisabled()
-    expect(screen.getByText('В заказе')).toBeInTheDocument()
+    expect(screen.getByText('Зарезервирован')).toBeInTheDocument()
   })
 
   it('направляет гостя на вход', () => {
@@ -61,7 +62,8 @@ describe('карточки каталога', () => {
   it('показывает остаток и ссылку запчасти', () => {
     renderCard(<PartCard part={part} />)
     expect(screen.getByText('В наличии: 3')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Подробнее/i })).toHaveAttribute('href', '/parts/part-1')
+    fireEvent.keyDown(screen.getByRole('link', { name: 'Открыть запчасть Фильтр' }), { key: 'Enter' })
+    expect(navigate).toHaveBeenCalledWith('/parts/part-1')
   })
 
   it('блокирует добавление отсутствующей запчасти', () => {
@@ -74,5 +76,6 @@ describe('карточки каталога', () => {
     renderCard(<PartCard part={part} />)
     fireEvent.click(screen.getByRole('button', { name: 'Корзина' }))
     expect(addToCart).toHaveBeenCalledWith(expect.objectContaining({ id: 'part-1', type: 'part' }))
+    expect(navigate).not.toHaveBeenCalledWith('/parts/part-1')
   })
 })

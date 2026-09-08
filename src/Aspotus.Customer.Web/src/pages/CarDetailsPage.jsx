@@ -35,7 +35,7 @@ export default function CarDetailsPage() {
       <Col lg={7} className="details-gallery-column"><ImageGallery images={images} alt={`${car.brandName} ${car.modelName}`} /></Col>
       <Col lg={5}><div className="details-info">
         <div className="d-flex gap-2 flex-wrap mb-3"><Badge bg="secondary">{car.year || 'Год не указан'}</Badge>
-          {car.bodyType && <Badge bg="dark">{car.bodyType}</Badge>}<Badge bg={available ? 'success' : 'warning'}>{available ? 'Доступен' : 'В заказе'}</Badge></div>
+          {car.bodyType && <Badge bg="dark">{car.bodyType}</Badge>}<Badge bg={available ? 'success' : 'warning'}>{available ? 'Доступен' : 'Зарезервирован'}</Badge></div>
         <h1>{car.brandName || 'Бренд'} {car.modelName || 'Модель'}</h1><p className="details-subtitle">{car.generationName}</p>
         <div className="details-specs"><div><span>Цена</span><strong className="details-price">{formatPrice(car.price)}</strong></div>
           <div><span>Пробег</span><strong>{Intl.NumberFormat('ru-RU').format(car.mileage || 0)} км</strong></div>
@@ -43,7 +43,7 @@ export default function CarDetailsPage() {
           <div><span>КПП / привод</span><strong>{[car.transmissionType, car.driveType].filter(Boolean).join(', ') || '—'}</strong></div>
           <div><span>Комплектация</span><strong>{car.trimLevelName || '—'}</strong></div></div>
         {car.trimLevelDescription && <div className="details-description"><h5>О комплектации</h5><p>{car.trimLevelDescription}</p></div>}
-        <Button className="mt-3 w-100" disabled={!available} onClick={add}>{available ? 'Добавить в корзину' : 'Автомобиль уже в заказе'}</Button>
+        <Button className="mt-3 w-100" disabled={!available} onClick={add}>{available ? 'Добавить в корзину' : 'Зарезервирован'}</Button>
       </div></Col>
     </Row></Card>
   </Container>

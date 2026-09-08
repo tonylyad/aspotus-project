@@ -41,6 +41,20 @@ public sealed class InventoryReservationServiceTests
         (await service.GetReservedPartQuantitiesAsync())[fixture.PartId].Should().Be(4);
     }
 
+    [Fact]
+    public async Task CompletedCarReservation_IsReportedAsSold()
+    {
+        await using var fixture = await CatalogFixture.CreateAsync();
+        var service = new InventoryReservationService(fixture.Context);
+        var orderId = Guid.NewGuid();
+
+        await service.ReserveAsync(Request(orderId, "Car", fixture.CarId, 1));
+        await service.CompleteAsync(orderId);
+        await service.CompleteAsync(orderId);
+
+        (await service.GetCompletedCarIdsAsync()).Should().ContainSingle().Which.Should().Be(fixture.CarId);
+    }
+
     private static ReserveInventoryRequest Request(Guid orderId, string type, Guid productId, int quantity) => new()
     {
         OrderId = orderId,

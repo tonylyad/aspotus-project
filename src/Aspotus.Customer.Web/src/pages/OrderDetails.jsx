@@ -5,6 +5,7 @@ import { getOrderById } from "../api/auth";
 
 import BackButton from "../components/common/BackButton"
 import OrderStatusIndicator from "../components/common/OrderStatusIndicator"
+import { formatPrice } from "../utils/cart.js"
 
 export default function OrderDetails() {
     const { id } = useParams();
@@ -133,7 +134,7 @@ export default function OrderDetails() {
                             Итоговая сумма
                         </div>
                         <div className="fs-4 fw-bold text-primary">
-                            {order.totalAmount ?? 0} $
+                            {formatPrice(order.totalAmount)}
                         </div>
                     </div>
 
@@ -168,7 +169,7 @@ export default function OrderDetails() {
                             <div className="d-flex justify-content-between align-items-end">
                                 <div style={{ color: "#adb5bd", fontSize: "0.85rem" }}>Цена за авто</div>
                                 <div className="fw-bold fs-4 text-primary">
-                                    {(item.price ?? order.totalAmount) ?? 0} $
+                                    {formatPrice(item.price ?? order.totalAmount)}
                                 </div>
                             </div>
                         </Card.Body>
@@ -197,10 +198,10 @@ export default function OrderDetails() {
                             </div>
                             <div className="d-flex justify-content-between align-items-end">
                                 <div style={{ color: "#adb5bd", fontSize: "0.85rem" }}>
-                                    {item.quantity} × {item.unitPrice ?? 0} $
+                                    {item.quantity} × {formatPrice(item.unitPrice)}
                                 </div>
                                 <div className="fw-bold text-primary fs-5">
-                                    {(item.quantity * (item.unitPrice ?? 0)).toFixed(2)} $
+                                    {formatPrice(item.quantity * (item.unitPrice ?? 0))}
                                 </div>
                             </div>
                         </Card.Body>

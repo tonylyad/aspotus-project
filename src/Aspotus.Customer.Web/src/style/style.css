@@ -111,7 +111,19 @@
 
 .image-container {
     position: relative;
-    display: block;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #000;
+}
+
+.image-container > .card-img-top {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 0;
 }
 
 .corner-badge {
@@ -508,21 +520,38 @@ a {
     color: var(--text);
 }
 
+.catalog-product-card {
+    cursor: pointer;
+}
+
+.catalog-product-card:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+}
+
 .image-gallery {
     width: 100%;
 }
 
 .image-gallery__main {
+    aspect-ratio: 4 / 3;
     border-radius: 20px;
     overflow: hidden;
-    background: #08090b;
+    background: #000;
+}
+
+.image-gallery__main .carousel,
+.image-gallery__main .carousel-inner,
+.image-gallery__main .carousel-item {
+    height: 100%;
 }
 
 .image-gallery__zoom-trigger {
     width: 100%;
+    height: 100%;
     padding: 0;
     border: 0;
-    background: #08090b;
+    background: #000;
     display: block;
     position: relative;
     cursor: zoom-in;
@@ -530,8 +559,7 @@ a {
 
 .image-gallery__main-image {
     width: 100%;
-    height: min(58vh,620px);
-    min-height: 340px;
+    height: 100%;
     object-fit: contain;
     display: block;
 }
@@ -594,14 +622,15 @@ a {
     .image-gallery__thumb img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
         border-radius: 7px;
+        background: #000;
     }
 
 .gallery-lightbox {
     position: fixed;
     inset: 0;
-    z-index: 2000;
+    z-index: 10000;
     background: rgba(0,0,0,.96);
     display: flex;
     align-items: center;
@@ -948,13 +977,13 @@ a {
 .home-preview-card__image {
     height: 220px;
     position: relative;
-    background: #0c0d0f;
+    background: #000;
 }
 
     .home-preview-card__image img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
         border-radius: 0;
     }
 
@@ -1217,9 +1246,8 @@ a {
         flex-direction: column;
     }
 
-    .image-gallery__main-image {
+    .image-gallery__main {
         min-height: 260px;
-        height: 48vh;
     }
 
     .gallery-lightbox {

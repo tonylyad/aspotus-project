@@ -11,6 +11,7 @@ public class InventoryReservationConfiguration : IEntityTypeConfiguration<Invent
         builder.ToTable("InventoryReservations");
         builder.HasKey(x => x.OrderId);
         builder.Property(x => x.CreatedAtUtc).IsRequired();
+        builder.Property(x => x.CompletedAtUtc);
         builder.HasMany(x => x.Items)
             .WithOne(x => x.Reservation)
             .HasForeignKey(x => x.OrderId)

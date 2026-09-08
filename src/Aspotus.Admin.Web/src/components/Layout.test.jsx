@@ -37,10 +37,10 @@ describe('Layout', () => {
     expect(screen.queryByRole('link', { name: 'Заказы' })).not.toBeInTheDocument()
   })
 
-  it('оставляет оператору заказы и заявки', () => {
+  it('оставляет оператору только раздел заказов', () => {
     renderLayout('Operator')
     expect(screen.getByRole('link', { name: 'Заказы' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Заявки клиентов' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Заявки клиентов' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Автомобили' })).not.toBeInTheDocument()
   })
 

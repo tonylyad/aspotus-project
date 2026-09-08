@@ -40,12 +40,19 @@ describe('Dashboard', () => {
     expect(screen.getByRole('link', { name: /Запчасти/ })).toHaveAttribute('href', '/parts')
   })
 
-  it('показывает операторский dashboard без запросов метрик администратора', () => {
+  it('загружает реальные заказы для операторского dashboard', async () => {
     isOperator.mockReturnValue(true)
-    const fetchMock = vi.fn()
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => [
+      { id: '11111111-1111-1111-1111-111111111111', customerName: 'Иван', customerEmail: 'ivan@example.com', orderType: 'Car', status: 'Created', totalAmount: 500000, createdAtUtc: '2026-09-08T10:00:00Z' },
+      { id: '22222222-2222-2222-2222-222222222222', customerName: 'Анна', customerEmail: 'anna@example.com', orderType: 'Part', status: 'Processing', totalAmount: 10000, createdAtUtc: '2026-09-08T11:00:00Z' },
+    ] })
     vi.stubGlobal('fetch', fetchMock)
     render(<MemoryRouter><Dashboard /></MemoryRouter>)
     expect(screen.getByText('Dashboard оператора')).toBeInTheDocument()
-    expect(fetchMock).not.toHaveBeenCalled()
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/orders/api/orders', expect.objectContaining({
+      headers: expect.objectContaining({ Authorization: expect.any(String) }),
+    })))
+    expect(await screen.findByText('Иван')).toBeInTheDocument()
+    expect(screen.getByText('500 000 ₽')).toBeInTheDocument()
   })
 })

@@ -9,6 +9,7 @@ public interface ICatalogInventoryClient
         CancellationToken cancellationToken = default);
 
     Task ReleaseAsync(Guid orderId, CancellationToken cancellationToken = default);
+    Task CompleteAsync(Guid orderId, CancellationToken cancellationToken = default);
 }
 
 public record CatalogReservationItemRequest(string ProductType, Guid ProductId, int Quantity);

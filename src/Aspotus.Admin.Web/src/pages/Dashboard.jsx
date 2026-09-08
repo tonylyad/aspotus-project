@@ -26,8 +26,7 @@ import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsAc
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined'
 import PaymentOutlinedIcon from '@mui/icons-material/PaymentOutlined'
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined'
-import PhoneInTalkOutlinedIcon from '@mui/icons-material/PhoneInTalkOutlined'
-import { adminDashboardMock, operatorDashboardMock } from '../mocks/dashboardMock.js'
+import { adminDashboardMock } from '../mocks/dashboardMock.js'
 import { isAdmin, isContentModerator, isOperator } from '../utils/auth.js'
 
 function formatNotificationTime(isoDate) {
@@ -73,15 +72,30 @@ function formatAmount(value) {
 }
 
 function formatDate(value) {
-  return new Date(value).toLocaleDateString('ru-RU')
+  return new Date(value).toLocaleString('ru-RU')
+}
+
+const orderStatusLabels = {
+  Created: 'Создан',
+  Processing: 'В обработке',
+  Completed: 'Завершён',
+  Cancelled: 'Отменён',
+}
+
+const orderTypeLabels = {
+  Part: 'Запчасти',
+  Car: 'Автомобиль',
 }
 
 export default function Dashboard() {
   const operator = isOperator()
   const admin = isAdmin()
   const contentModerator = isContentModerator()
-  const [unpaidStatusFilter, setUnpaidStatusFilter] = useState('all')
-  const [myOrdersSearch, setMyOrdersSearch] = useState('')
+  const [operatorStatusFilter, setOperatorStatusFilter] = useState('all')
+  const [operatorOrdersSearch, setOperatorOrdersSearch] = useState('')
+  const [operatorOrders, setOperatorOrders] = useState([])
+  const [operatorOrdersLoading, setOperatorOrdersLoading] = useState(operator)
+  const [operatorOrdersError, setOperatorOrdersError] = useState('')
   const [adminMetrics, setAdminMetrics] = useState({ totalOrders: 0, totalUsers: 0, operators: 0 })
   const [adminMetricsLoading, setAdminMetricsLoading] = useState(admin)
   const [adminMetricsError, setAdminMetricsError] = useState('')
@@ -132,21 +146,52 @@ export default function Dashboard() {
     return () => controller.abort()
   }, [admin])
 
+  useEffect(() => {
+    if (!operator) return undefined
+
+    const controller = new AbortController()
+    const token = localStorage.getItem('token')
+
+    async function loadOperatorOrders() {
+      try {
+        const response = await fetch('/orders/api/orders', {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: controller.signal,
+        })
+        if (!response.ok) throw new Error('Не удалось загрузить данные панели оператора')
+        setOperatorOrders(await response.json())
+      } catch (error) {
+        if (error.name !== 'AbortError') setOperatorOrdersError(error.message)
+      } finally {
+        if (!controller.signal.aborted) setOperatorOrdersLoading(false)
+      }
+    }
+
+    loadOperatorOrders()
+    return () => controller.abort()
+  }, [operator])
+
   if (operator) {
-    // TODO: Replace with API request for operator dashboard data.
-    const data = operatorDashboardMock
-    const unpaidOrders = data.unpaidOrdersTable.filter((row) => unpaidStatusFilter === 'all' || row.status === unpaidStatusFilter)
-    const myOrders = data.myOrdersTable.filter((row) => {
-      if (!myOrdersSearch) return true
-      const query = myOrdersSearch.toLowerCase().trim()
-      return row.id.toLowerCase().includes(query) || row.customer.toLowerCase().includes(query)
+    const metrics = {
+      total: operatorOrders.length,
+      created: operatorOrders.filter((order) => order.status === 'Created').length,
+      processing: operatorOrders.filter((order) => order.status === 'Processing').length,
+      completed: operatorOrders.filter((order) => order.status === 'Completed').length,
+    }
+    const visibleOrders = operatorOrders.filter((order) => {
+      if (operatorStatusFilter !== 'all' && order.status !== operatorStatusFilter) return false
+      if (!operatorOrdersSearch.trim()) return true
+      const query = operatorOrdersSearch.toLowerCase().trim()
+      return order.id?.toLowerCase().includes(query) ||
+        order.customerName?.toLowerCase().includes(query) ||
+        order.customerEmail?.toLowerCase().includes(query)
     })
 
     return (
       <Box>
         <Typography variant="h5" fontWeight={700} mb={0.5}>Dashboard оператора</Typography>
         <Typography variant="body2" color="text.secondary" mb={3}>
-          Оперативные показатели, клиентские обращения и заказы в работе.
+          Актуальные показатели и заказы из системы.
         </Typography>
 
         <Box
@@ -157,48 +202,36 @@ export default function Dashboard() {
             mb: 3,
           }}
         >
-          <MetricCard title="Всего заказов" value={data.metrics.totalOrders} subtitle="За все время" icon={<ReceiptLongOutlinedIcon fontSize="small" />} />
-          <MetricCard title="Новые заказы" value={data.metrics.newOrders} subtitle="За текущую смену" icon={<ShoppingCartOutlinedIcon fontSize="small" />} />
-          <MetricCard title="Неоплаченные" value={data.metrics.unpaidOrders} subtitle="Требуют контроль" icon={<PaymentOutlinedIcon fontSize="small" />} />
-          <MetricCard title="Мои заказы" value={data.metrics.myOrders} subtitle="Назначены на меня" icon={<AssignmentIndOutlinedIcon fontSize="small" />} />
+          <MetricCard title="Всего заказов" value={operatorOrdersLoading ? '—' : metrics.total} subtitle="За всё время" icon={<ReceiptLongOutlinedIcon fontSize="small" />} />
+          <MetricCard title="Новые" value={operatorOrdersLoading ? '—' : metrics.created} subtitle="Ожидают обработки" icon={<ShoppingCartOutlinedIcon fontSize="small" />} />
+          <MetricCard title="В обработке" value={operatorOrdersLoading ? '—' : metrics.processing} subtitle="Сейчас в работе" icon={<PaymentOutlinedIcon fontSize="small" />} />
+          <MetricCard title="Завершённые" value={operatorOrdersLoading ? '—' : metrics.completed} subtitle="Успешно обработаны" icon={<AssignmentIndOutlinedIcon fontSize="small" />} />
         </Box>
 
-        <Card sx={{ borderRadius: 3, boxShadow: '0 8px 28px rgba(15, 23, 42, 0.06)', mb: 3 }}>
-          <CardContent>
-            <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
-              <PhoneInTalkOutlinedIcon color="primary" fontSize="small" />
-              <Typography variant="h6" fontWeight={700}>Обращения клиентов</Typography>
-            </Stack>
-            <Stack spacing={1.25}>
-              {data.customerCallbacks.map((item) => (
-                <Box key={item.id} sx={{ p: 1.5, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
-                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={0.5} sx={{ justifyContent: 'space-between' }}>
-                    <Typography fontWeight={600}>{item.name}</Typography>
-                    <Typography variant="body2" color="text.secondary">{item.phone}</Typography>
-                  </Stack>
-                  <Typography variant="caption" color="text.secondary">Перезвонить</Typography>
-                </Box>
-              ))}
-            </Stack>
-          </CardContent>
-        </Card>
+        {operatorOrdersError && <Typography color="error" variant="body2" mb={2}>{operatorOrdersError}</Typography>}
 
-        <Box sx={{ display: 'grid', gap: 2.5, gridTemplateColumns: { xs: '1fr', xl: '1fr 1fr' } }}>
-          <Card sx={{ borderRadius: 3, boxShadow: '0 8px 28px rgba(15, 23, 42, 0.06)' }}>
+        <Card sx={{ borderRadius: 3, boxShadow: '0 8px 28px rgba(15, 23, 42, 0.06)' }}>
             <CardContent>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ justifyContent: 'space-between', mb: 1.5 }}>
-                <Typography variant="h6" fontWeight={700}>Неоплаченные заказы</Typography>
+                <Typography variant="h6" fontWeight={700}>Последние заказы</Typography>
+                <TextField
+                  size="small"
+                  value={operatorOrdersSearch}
+                  onChange={(e) => setOperatorOrdersSearch(e.target.value)}
+                  placeholder="Поиск по № или клиенту"
+                  sx={{ minWidth: 260 }}
+                />
                 <FormControl size="small" sx={{ minWidth: 220 }}>
                   <InputLabel>Фильтр по статусу</InputLabel>
                   <Select
-                    value={unpaidStatusFilter}
+                    value={operatorStatusFilter}
                     label="Фильтр по статусу"
-                    onChange={(e) => setUnpaidStatusFilter(e.target.value)}
+                    onChange={(e) => setOperatorStatusFilter(e.target.value)}
                   >
                     <MenuItem value="all">Все</MenuItem>
-                    <MenuItem value="Ожидает оплату">Ожидает оплату</MenuItem>
-                    <MenuItem value="Частично оплачено">Частично оплачено</MenuItem>
-                    <MenuItem value="Просрочка 1 день">Просрочка 1 день</MenuItem>
+                    {Object.entries(orderStatusLabels).map(([value, label]) => (
+                      <MenuItem key={value} value={value}>{label}</MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Stack>
@@ -208,68 +241,32 @@ export default function Dashboard() {
                     <TableRow>
                       <TableCell>№ заказа</TableCell>
                       <TableCell>Клиент</TableCell>
+                      <TableCell>Тип</TableCell>
                       <TableCell align="right">Сумма</TableCell>
-                      <TableCell>Срок оплаты</TableCell>
+                      <TableCell>Дата</TableCell>
                       <TableCell>Статус</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {unpaidOrders.map((row) => (
-                      <TableRow key={row.id} hover>
-                        <TableCell>{row.id}</TableCell>
-                        <TableCell>{row.customer}</TableCell>
-                        <TableCell align="right">{formatAmount(row.amount)}</TableCell>
-                        <TableCell>{formatDate(row.dueDate)}</TableCell>
-                        <TableCell>{row.status}</TableCell>
+                    {operatorOrdersLoading ? (
+                      <TableRow><TableCell colSpan={6} align="center">Загрузка…</TableCell></TableRow>
+                    ) : visibleOrders.length === 0 ? (
+                      <TableRow><TableCell colSpan={6} align="center">Заказы не найдены</TableCell></TableRow>
+                    ) : visibleOrders.slice(0, 10).map((order) => (
+                      <TableRow key={order.id} hover>
+                        <TableCell>{order.id?.slice(0, 8)}</TableCell>
+                        <TableCell>{order.customerName}</TableCell>
+                        <TableCell>{orderTypeLabels[order.orderType] || order.orderType}</TableCell>
+                        <TableCell align="right">{formatAmount(order.totalAmount)}</TableCell>
+                        <TableCell>{formatDate(order.createdAtUtc)}</TableCell>
+                        <TableCell>{orderStatusLabels[order.status] || order.status}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </TableContainer>
             </CardContent>
-          </Card>
-
-          <Card sx={{ borderRadius: 3, boxShadow: '0 8px 28px rgba(15, 23, 42, 0.06)' }}>
-            <CardContent>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ justifyContent: 'space-between', mb: 1.5 }}>
-                <Typography variant="h6" fontWeight={700}>Мои заказы</Typography>
-                <TextField
-                  size="small"
-                  value={myOrdersSearch}
-                  onChange={(e) => setMyOrdersSearch(e.target.value)}
-                  placeholder="Поиск по № или клиенту"
-                  sx={{ minWidth: 260 }}
-                />
-              </Stack>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>№ заказа</TableCell>
-                      <TableCell>Клиент</TableCell>
-                      <TableCell>Тип</TableCell>
-                      <TableCell align="right">Сумма</TableCell>
-                      <TableCell>Этап</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {myOrders.map((row) => (
-                      <TableRow key={row.id} hover>
-                        <TableCell>{row.id}</TableCell>
-                        <TableCell>{row.customer}</TableCell>
-                        <TableCell>{row.type}</TableCell>
-                        <TableCell align="right">{formatAmount(row.amount)}</TableCell>
-                        <TableCell>{row.stage}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </CardContent>
-          </Card>
-        </Box>
-
-        {/* TODO: Add row actions and navigation to order card after backend routes are finalized. */}
+        </Card>
       </Box>
     )
   }

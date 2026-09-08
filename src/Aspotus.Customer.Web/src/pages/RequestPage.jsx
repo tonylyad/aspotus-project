@@ -21,6 +21,7 @@ export default function RequestPage() {
         trim: "",
         engine: "",
         transmission: "",
+        driveType: "",
         year: "",
         bodyType: "",
         // part
@@ -39,7 +40,7 @@ export default function RequestPage() {
 
         setFormData((prev) => ({
             ...prev,
-            brand: "", model: "", trim: "", engine: "", transmission: "", year: "", bodyType: "",
+            brand: "", model: "", trim: "", engine: "", transmission: "", driveType: "", year: "", bodyType: "",
             article: "", partName: "", condition: "", vinOrChassis: ""
         }));
         setError("");
@@ -205,21 +206,48 @@ export default function RequestPage() {
                                             </Form.Group>
 
                                             <Form.Group className="form-group-custom">
-                                                <Form.Label>Мотор</Form.Label>
+                                                <Form.Label>Тип двигателя</Form.Label>
                                                 <Form.Control
-                                                    type="text"
+                                                    as="select"
                                                     value={formData.engine}
                                                     onChange={(e) => handleInputChange("engine", e.target.value)}
-                                                />
+                                                >
+                                                    <option value="">Выберите тип двигателя</option>
+                                                    <option value="Petrol">Бензиновый</option>
+                                                    <option value="Diesel">Дизельный</option>
+                                                    <option value="Hybrid">Гибридный</option>
+                                                    <option value="Electric">Электрический</option>
+                                                    <option value="Lpg">Газовый</option>
+                                                </Form.Control>
                                             </Form.Group>
 
                                             <Form.Group className="form-group-custom">
-                                                <Form.Label>КПП</Form.Label>
+                                                <Form.Label>Трансмиссия</Form.Label>
                                                 <Form.Control
-                                                    type="text"
+                                                    as="select"
                                                     value={formData.transmission}
                                                     onChange={(e) => handleInputChange("transmission", e.target.value)}
-                                                />
+                                                >
+                                                    <option value="">Выберите трансмиссию</option>
+                                                    <option value="Manual">Механическая</option>
+                                                    <option value="Automatic">Автоматическая</option>
+                                                    <option value="Cvt">Вариатор</option>
+                                                    <option value="Robot">Роботизированная</option>
+                                                </Form.Control>
+                                            </Form.Group>
+
+                                            <Form.Group className="form-group-custom">
+                                                <Form.Label>Привод</Form.Label>
+                                                <Form.Control
+                                                    as="select"
+                                                    value={formData.driveType}
+                                                    onChange={(e) => handleInputChange("driveType", e.target.value)}
+                                                >
+                                                    <option value="">Выберите привод</option>
+                                                    <option value="Fwd">Передний</option>
+                                                    <option value="Rwd">Задний</option>
+                                                    <option value="Awd">Полный</option>
+                                                </Form.Control>
                                             </Form.Group>
 
                                             <Form.Group className="form-group-custom">
@@ -243,15 +271,15 @@ export default function RequestPage() {
                                                     required
                                                 >
                                                     <option value="" disabled>Выберите тип кузова</option>
-                                                    <option value="sedan">Седан</option>
-                                                    <option value="hatchback">Хэтчбек</option>
-                                                    <option value="suv">Кроссовер/SUV</option>
-                                                    <option value="wagon">Универсал</option>
-                                                    <option value="coupe">Купе</option>
-                                                    <option value="convertible">Кабриолет</option>
-                                                    <option value="minivan">Минивэн</option>
-                                                    <option value="pickup">Пикап</option>
-                                                    <option value="other">Другое</option>
+                                                    <option value="Sedan">Седан</option>
+                                                    <option value="Hatchback">Хэтчбек</option>
+                                                    <option value="Liftback">Лифтбек</option>
+                                                    <option value="Suv">Кроссовер/SUV</option>
+                                                    <option value="Wagon">Универсал</option>
+                                                    <option value="Coupe">Купе</option>
+                                                    <option value="Convertible">Кабриолет</option>
+                                                    <option value="Minivan">Минивэн</option>
+                                                    <option value="Pickup">Пикап</option>
                                                 </Form.Control>
                                             </Form.Group>
                                         </>

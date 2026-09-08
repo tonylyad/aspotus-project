@@ -16,6 +16,39 @@ import {
 
 const API = '/catalog/api'
 
+const bodyTypes = [
+  ['Sedan', 'Седан'],
+  ['Hatchback', 'Хэтчбек'],
+  ['Liftback', 'Лифтбек'],
+  ['Wagon', 'Универсал'],
+  ['Coupe', 'Купе'],
+  ['Convertible', 'Кабриолет'],
+  ['Suv', 'Кроссовер / внедорожник'],
+  ['Minivan', 'Минивэн'],
+  ['Pickup', 'Пикап'],
+]
+
+const engineTypes = [
+  ['Petrol', 'Бензиновый'],
+  ['Diesel', 'Дизельный'],
+  ['Hybrid', 'Гибридный'],
+  ['Electric', 'Электрический'],
+  ['Lpg', 'Газовый'],
+]
+
+const transmissionTypes = [
+  ['Manual', 'Механическая'],
+  ['Automatic', 'Автоматическая'],
+  ['Cvt', 'Вариатор'],
+  ['Robot', 'Роботизированная'],
+]
+
+const driveTypes = [
+  ['Fwd', 'Передний'],
+  ['Rwd', 'Задний'],
+  ['Awd', 'Полный'],
+]
+
 async function apiGet(url) {
   const token = localStorage.getItem('token')
   const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
@@ -243,7 +276,7 @@ export default function Cars() {
                   <TableCell>{i.modelName}</TableCell>
                   <TableCell>{i.generationName}</TableCell>
                   <TableCell>{i.year}</TableCell>
-                  <TableCell>{i.price?.toLocaleString('ru-RU')} ₸</TableCell>
+                  <TableCell>{i.price?.toLocaleString('ru-RU')} ₽</TableCell>
                   <TableCell>{i.bodyType}</TableCell>
                   <TableCell>{i.engineVolume}L {i.fuelType}</TableCell>
                   <TableCell>{i.driveType}</TableCell>
@@ -289,18 +322,38 @@ export default function Cars() {
               <TextField label="Пробег (км)" type="number" value={form.mileage} onChange={setField('mileage')} required fullWidth slotProps={{ htmlInput: { min: 0 } }} />
             </Box>
 
-            <TextField label="Цена (₸)" type="number" value={form.price} onChange={setField('price')} required fullWidth slotProps={{ htmlInput: { min: 0.01, step: 0.01 } }} />
+            <TextField label="Цена (₽)" type="number" value={form.price} onChange={setField('price')} required fullWidth slotProps={{ htmlInput: { min: 0.01, step: 0.01 } }} />
 
-            <TextField label="Тип кузова" value={form.bodyType} onChange={setField('bodyType')} required fullWidth placeholder="Седан, Хэтчбек, Внедорожник…" />
+            <FormControl fullWidth required>
+              <InputLabel>Тип кузова</InputLabel>
+              <Select value={form.bodyType} label="Тип кузова" onChange={setField('bodyType')}>
+                {bodyTypes.map(([value, label]) => <MenuItem key={value} value={value}>{label}</MenuItem>)}
+              </Select>
+            </FormControl>
 
             <Box className="form-fields__row">
               <TextField label="Объём двигателя (L)" type="number" value={form.engineVolume} onChange={setField('engineVolume')} required fullWidth slotProps={{ htmlInput: { min: 0.1, max: 20, step: 0.1 } }} />
-              <TextField label="Тип топлива" value={form.fuelType} onChange={setField('fuelType')} required fullWidth placeholder="Бензин, Дизель…" />
+              <FormControl fullWidth required>
+                <InputLabel>Тип двигателя</InputLabel>
+                <Select value={form.fuelType} label="Тип двигателя" onChange={setField('fuelType')}>
+                  {engineTypes.map(([value, label]) => <MenuItem key={value} value={value}>{label}</MenuItem>)}
+                </Select>
+              </FormControl>
             </Box>
 
             <Box className="form-fields__row">
-              <TextField label="Трансмиссия" value={form.transmissionType} onChange={setField('transmissionType')} required fullWidth placeholder="Механика, Автомат…" />
-              <TextField label="Привод" value={form.driveType} onChange={setField('driveType')} required fullWidth placeholder="Передний, Задний, Полный" />
+              <FormControl fullWidth required>
+                <InputLabel>Трансмиссия</InputLabel>
+                <Select value={form.transmissionType} label="Трансмиссия" onChange={setField('transmissionType')}>
+                  {transmissionTypes.map(([value, label]) => <MenuItem key={value} value={value}>{label}</MenuItem>)}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth required>
+                <InputLabel>Привод</InputLabel>
+                <Select value={form.driveType} label="Привод" onChange={setField('driveType')}>
+                  {driveTypes.map(([value, label]) => <MenuItem key={value} value={value}>{label}</MenuItem>)}
+                </Select>
+              </FormControl>
             </Box>
 
             <TextField label="Комплектация" value={form.trimLevelName} onChange={setField('trimLevelName')} fullWidth />

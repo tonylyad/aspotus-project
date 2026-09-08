@@ -1,11 +1,15 @@
 import { Navbar, Nav, Container, Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom"
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 import { useNavigate } from "react-router-dom"
+import { FiShoppingCart } from "react-icons/fi";
 export default function Header() {
 
     const { user, logout } = useAuth();
+    const { cart } = useCart();
     const navigate = useNavigate();
+    const cartItemCount = cart.reduce((total, item) => total + Number(item.quantity || 0), 0);
 
     function logoutFnc ()
     {
@@ -51,6 +55,17 @@ export default function Header() {
                             О нас
                         </Nav.Link>
 
+                        <Nav.Link
+                            as={Link}
+                            to="/cart"
+                            className="header-cart-link"
+                            aria-label={`Корзина: ${cartItemCount} товаров`}
+                            title="Корзина"
+                        >
+                            <FiShoppingCart aria-hidden="true" />
+                            <span className="header-cart-count">{cartItemCount}</span>
+                        </Nav.Link>
+
                         {user ? (
                             <Dropdown>
                                 <Dropdown.Toggle>
@@ -60,9 +75,6 @@ export default function Header() {
                                 <Dropdown.Menu>
                                     <Dropdown.Item as={Link} to="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>
                                         Профиль
-                                    </Dropdown.Item>
-                                    <Dropdown.Item as={Link} to="/cart" style={{ textDecoration: 'none', color: 'inherit' }}>
-                                        Корзина
                                     </Dropdown.Item>
                                     <Dropdown.Item onClick={logoutFnc}>
                                         Выйти

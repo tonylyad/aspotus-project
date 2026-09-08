@@ -129,6 +129,8 @@ public class OrderService : IOrderService
         {
             if (request.Status == OrderStatus.Cancelled)
                 await _catalogInventoryClient.ReleaseAsync(id, cancellationToken);
+            if (request.Status == OrderStatus.Completed)
+                await _catalogInventoryClient.CompleteAsync(id, cancellationToken);
 
             return OrderMapper.ToResponse(order);
         }
@@ -148,6 +150,8 @@ public class OrderService : IOrderService
 
         if (request.Status == OrderStatus.Cancelled)
             await _catalogInventoryClient.ReleaseAsync(id, cancellationToken);
+        if (request.Status == OrderStatus.Completed)
+            await _catalogInventoryClient.CompleteAsync(id, cancellationToken);
 
         return OrderMapper.ToResponse(order);
     }

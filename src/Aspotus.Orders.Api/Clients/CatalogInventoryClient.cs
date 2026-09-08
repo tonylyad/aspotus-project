@@ -46,6 +46,14 @@ public class CatalogInventoryClient : ICatalogInventoryClient
         response.EnsureSuccessStatusCode();
     }
 
+    public async Task CompleteAsync(Guid orderId, CancellationToken cancellationToken = default)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, $"api/inventory-reservations/{orderId}/complete");
+        AddApiKey(request);
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+    }
+
     private void AddApiKey(HttpRequestMessage request)
     {
         request.Headers.Add("X-Internal-Api-Key", _configuration["Catalog:InternalApiKey"]);

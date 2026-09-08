@@ -12,7 +12,6 @@ const navItems = [
   { to: '/cars', label: 'Автомобили', roles: ['Admin', 'ContentModerator'] },
   { to: '/parts', label: 'Запчасти', roles: ['Admin', 'ContentModerator'] },
   { to: '/orders', label: 'Заказы', roles: ['Admin', 'Operator'] },
-  { to: '/requests', label: 'Заявки клиентов', roles: ['Admin', 'Operator'] },
 ]
 
 export default function Layout() {

@@ -33,6 +33,14 @@ public class InventoryReservationsController : ControllerBase
         return NoContent();
     }
 
+    [HttpPost("{orderId:guid}/complete")]
+    public async Task<IActionResult> Complete(Guid orderId, CancellationToken cancellationToken)
+    {
+        if (!HasValidApiKey()) return Unauthorized();
+        await _service.CompleteAsync(orderId, cancellationToken);
+        return NoContent();
+    }
+
     private bool HasValidApiKey()
     {
         var configured = _configuration["InternalApiKey"];

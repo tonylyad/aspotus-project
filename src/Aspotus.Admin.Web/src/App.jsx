@@ -13,7 +13,6 @@ const Users = lazy(() => import('./pages/Users.jsx'))
 const Parts = lazy(() => import('./pages/Parts.jsx'))
 const Brands = lazy(() => import('./pages/Brands.jsx'))
 const Orders = lazy(() => import('./pages/Orders.jsx'))
-const Requests = lazy(() => import('./pages/Requests.jsx'))
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token')
@@ -50,7 +49,6 @@ export default function App() {
         <Route path="/manufacturers" element={<RoleRoute roles={['Admin', 'ContentModerator']}><Manufacturers /></RoleRoute>} />
         <Route path="/parts" element={<RoleRoute roles={['Admin', 'ContentModerator']}><Parts /></RoleRoute>} />
         <Route path="/orders" element={<RoleRoute roles={['Admin', 'Operator']}><Orders /></RoleRoute>} />
-        <Route path="/requests" element={<RoleRoute roles={['Admin', 'Operator']}><Requests /></RoleRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes></Suspense>

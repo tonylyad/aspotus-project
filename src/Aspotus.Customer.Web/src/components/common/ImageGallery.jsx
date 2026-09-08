@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
+import { createPortal } from "react-dom"
 import { Carousel } from "react-bootstrap"
 import { FiChevronLeft, FiChevronRight, FiMaximize2, FiX } from "react-icons/fi"
 
@@ -82,9 +83,9 @@ export default function ImageGallery({ images = [], alt = "Фото", className 
                 )}
             </div>
 
-            {fullscreen && (
-                <div className="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Просмотр фотографии">
-                    <button type="button" className="gallery-lightbox__close" onClick={() => setFullscreen(false)} aria-label="Закрыть">
+            {fullscreen && createPortal(
+                <div className="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Просмотр фотографии" onClick={() => setFullscreen(false)}>
+                    <button type="button" className="gallery-lightbox__close" onClick={() => setFullscreen(false)} aria-label="Закрыть фотографию">
                         <FiX />
                     </button>
                     {safeImages.length > 1 && (
@@ -92,7 +93,10 @@ export default function ImageGallery({ images = [], alt = "Фото", className 
                             <button
                                 type="button"
                                 className="gallery-lightbox__nav gallery-lightbox__nav--left"
-                                onClick={() => setActive((value) => (value - 1 + safeImages.length) % safeImages.length)}
+                                onClick={(event) => {
+                                    event.stopPropagation()
+                                    setActive((value) => (value - 1 + safeImages.length) % safeImages.length)
+                                }}
                                 aria-label="Предыдущее фото"
                             >
                                 <FiChevronLeft />
@@ -100,16 +104,20 @@ export default function ImageGallery({ images = [], alt = "Фото", className 
                             <button
                                 type="button"
                                 className="gallery-lightbox__nav gallery-lightbox__nav--right"
-                                onClick={() => setActive((value) => (value + 1) % safeImages.length)}
+                                onClick={(event) => {
+                                    event.stopPropagation()
+                                    setActive((value) => (value + 1) % safeImages.length)
+                                }}
                                 aria-label="Следующее фото"
                             >
                                 <FiChevronRight />
                             </button>
                         </>
                     )}
-                    <img className="gallery-lightbox__image" src={safeImages[active]} alt={`${alt} ${active + 1}`} />
+                    <img className="gallery-lightbox__image" src={safeImages[active]} alt={`${alt} ${active + 1}`} onClick={(event) => event.stopPropagation()} />
                     <div className="gallery-lightbox__counter">{active + 1} / {safeImages.length}</div>
-                </div>
+                </div>,
+                document.body,
             )}
         </>
     )
