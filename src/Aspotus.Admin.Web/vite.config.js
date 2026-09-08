@@ -19,7 +19,7 @@ export default defineConfig({
         target: gatewayTarget,
         changeOrigin: true,
       },
-      '/orders': {
+      '/orders/api': {
         target: gatewayTarget,
         changeOrigin: true,
       },

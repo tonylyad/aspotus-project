@@ -14,7 +14,7 @@ export default defineConfig({
         proxy: {
             '/api': { target: gatewayTarget, changeOrigin: true },
             '/catalog': { target: gatewayTarget, changeOrigin: true },
-            '/orders': { target: gatewayTarget, changeOrigin: true },
+            '/orders/api': { target: gatewayTarget, changeOrigin: true },
             '/files': { target: gatewayTarget, changeOrigin: true },
         },
     }
