@@ -4,3 +4,11 @@ GET {{Aspotus.Filestore.Api_HostAddress}}/files/
 Accept: application/json
 
 ###
+
+GET {{Aspotus.Filestore.Api_HostAddress}}/Files/content?key=cars%2Fexample%2Fphoto.jpg
+
+###
+
+DELETE {{Aspotus.Filestore.Api_HostAddress}}/Files/content?key=cars%2Fexample%2Fphoto.jpg
+
+###

@@ -1,5 +1,6 @@
 using Aspotus.Filestore.Api.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace Aspotus.Filestore.Api.Controllers
 {
@@ -7,6 +8,7 @@ namespace Aspotus.Filestore.Api.Controllers
     [Route("[controller]")]
     public class FilesController : ControllerBase
     {
+        private static readonly FileExtensionContentTypeProvider ContentTypeProvider = new();
         private readonly IFileService _fileService;
 
         public FilesController(IFileService fileService)
@@ -24,19 +26,23 @@ namespace Aspotus.Filestore.Api.Controllers
             });
         }
 
-        [HttpGet("{**key}")]
-        public async Task<IActionResult> GetById([FromRoute] string key, CancellationToken cancellationToken)
+        [HttpGet("content")]
+        public async Task<IActionResult> GetById([FromQuery] string key, CancellationToken cancellationToken)
         {
             return await Execute(async () =>
             {
                 var result = await _fileService.DownloadFileAsync(key, cancellationToken);
-                return Ok(result);
+                var contentType = ContentTypeProvider.TryGetContentType(key, out var detectedContentType)
+                    ? detectedContentType
+                    : "application/octet-stream";
+
+                return File(result, contentType, enableRangeProcessing: true);
             });
         }
 
-        [HttpPost("{**key}")]
+        [HttpPost("content")]
         [Consumes("application/octet-stream")]
-        public async Task<IActionResult> Create([FromRoute] string key, [FromBody] byte[] content, CancellationToken cancellationToken)
+        public async Task<IActionResult> Create([FromQuery] string key, [FromBody] byte[] content, CancellationToken cancellationToken)
         {
             return await Execute(async () =>
             {
@@ -45,8 +51,8 @@ namespace Aspotus.Filestore.Api.Controllers
             });
         }
 
-        [HttpDelete("{**key}")]
-        public async Task<IActionResult> Delete([FromRoute] string key, CancellationToken cancellationToken)
+        [HttpDelete("content")]
+        public async Task<IActionResult> Delete([FromQuery] string key, CancellationToken cancellationToken)
         {
             return await Execute(async () =>
             {

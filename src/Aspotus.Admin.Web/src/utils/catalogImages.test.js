@@ -35,7 +35,7 @@ describe('uploadCatalogImages', () => {
     vi.stubGlobal('fetch', fetchMock)
     const file = new File(['image'], 'PHOTO.JPEG', { type: 'image/jpeg' })
     await expect(uploadCatalogImages('cars', 'car-1', [{ pending: true, file }])).resolves.toEqual([response])
-    expect(fetchMock).toHaveBeenCalledWith('/files/Files/cars/car-1/file-id.jpeg', expect.objectContaining({
+    expect(fetchMock).toHaveBeenCalledWith('/files/Files/content?key=cars%2Fcar-1%2Ffile-id.jpeg', expect.objectContaining({
       method: 'POST', body: file, headers: expect.objectContaining({ Authorization: 'Bearer jwt' }),
     }))
   })
@@ -53,7 +53,7 @@ describe('deleteCatalogImages', () => {
     vi.stubGlobal('fetch', fetchMock)
     await deleteCatalogImages(['a.jpg', 'b.jpg'])
     expect(fetchMock).toHaveBeenCalledTimes(2)
-    expect(fetchMock).toHaveBeenCalledWith('/files/Files/a.jpg', expect.objectContaining({ method: 'DELETE' }))
+    expect(fetchMock).toHaveBeenCalledWith('/files/Files/content?key=a.jpg', expect.objectContaining({ method: 'DELETE' }))
   })
 
   it('считает отсутствующий файл успешно удалённым', async () => {

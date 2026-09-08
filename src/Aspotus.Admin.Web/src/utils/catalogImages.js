@@ -10,7 +10,7 @@ export async function uploadCatalogImages(kind, entityId, items) {
 
     const extension = item.file.name.split('.').pop()?.toLowerCase() || 'jpg'
     const key = `${kind}/${entityId}/${crypto.randomUUID()}.${extension}`
-    const response = await fetch(`/files/Files/${key}`, {
+    const response = await fetch(`/files/Files/content?key=${encodeURIComponent(key)}`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -28,7 +28,7 @@ export async function uploadCatalogImages(kind, entityId, items) {
 
 export async function deleteCatalogImages(keys) {
   const token = localStorage.getItem('token')
-  const responses = await Promise.all(keys.map((key) => fetch(`/files/Files/${key}`, {
+  const responses = await Promise.all(keys.map((key) => fetch(`/files/Files/content?key=${encodeURIComponent(key)}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   })))
